@@ -2,10 +2,11 @@
     <div id="index">
         <router-view></router-view>
         <mt-tabbar v-model="active" fixed>
-            <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item">
-                <img slot="icon" src="@/assets/logo.png">{{ item }}
+            <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
+                <img slot="icon" :src="require(`@/assets/iconfont/${item.name}.svg`)">{{ item.label }}
             </mt-tab-item>
         </mt-tabbar>
+        <div class="bottom-block"></div>
     </div>
 </template>
 
@@ -15,7 +16,20 @@
         data() {
             return {
                 active: 'home',
-                tabItem: ['home','detail','user']
+                tabItem: [
+                    {
+                        name: 'home',
+                        label: '主页',
+                    },
+                    {
+                        name: 'detail',
+                        label: '详细',
+                    },
+                    {
+                        name: 'user',
+                        label: '用户',
+                    },
+                ]
             }
         },
         watch: {
@@ -29,7 +43,9 @@
 
 <style lang="less">
     #index{
-        width: 100%;
-        height: 100%;
+        .bottom-block {
+            width: 100%;
+            height: 55px;
+        }
     }
 </style>

@@ -1,21 +1,42 @@
 <template>
     <div id="home">
        <div class="test-header">
-           <!-- <div class="circle">
-
-           </div> -->
-           <el-progress type="circle" width="200" :percentage="30">123</el-progress>
-           <div class="data-box">
+           <p class="header">危机指数</p>
+           <el-progress 
+                type="circle" 
+                :width='160' 
+                :stroke-width='10' 
+                :color="circleColor" 
+                :percentage="animatedNumber">
+            </el-progress>
+           <!-- <div class="data-box">
                <div class="box-item"><div class="status-circle"></div>血糖</div>
                <div class="box-item"><div class="status-circle"></div>血压</div>
-           </div>
+           </div> -->
        </div>
        <div class="test-container">
            <div class="test-item">
-               血糖
+               <el-progress 
+                    type="circle" 
+                    :width='60' 
+                    :stroke-width='6' 
+                    :color="circleColor" 
+                    :percentage="85">
+                </el-progress>
+                <div class="item-text">
+                    <div class="header">血糖危机指数</div>
+                    <div class="footer">血糖过高，请就医。77777777777777</div>
+                </div>
            </div>
            <div class="test-item">
-               血压
+               <el-progress 
+                    type="circle" 
+                    :width='60' 
+                    :stroke-width='6' 
+                    :color="circleColor" 
+                    :percentage="66">
+                </el-progress>
+                血压
            </div>
        </div>
        
@@ -23,27 +44,94 @@
 </template>
 
 <script>
+// import { parse } from 'path';
+    // var Color = net.brehaut.Color
     export default {
-        name: 'home'
+        name: 'home',
+        data() {
+            return {
+                number: 0,
+                tweenedNumber: 0,
+            }
+        },
+        created: function () {
+            // this.tweenedColor = Object.assign({}, this.color)
+        },
+        computed: {
+            animatedNumber() {
+                return parseInt(this.tweenedNumber.toFixed())
+            },
+            circleColor() {
+                let x = this.number
+                switch(true) {
+                    case x < 30: return 'green'
+                    case x < 70 && x >= 30: return 'yellow'
+                    case x >= 70: return 'red'
+                }
+            }
+            // tweenedCSSColor: function () {
+            //     return new Color({
+            //         red: this.tweenedColor.red,
+            //         green: this.tweenedColor.green,
+            //         blue: this.tweenedColor.blue,
+            //         yellow: this.tweenedColor.yellow,
+            //     }).toCSS()
+            // }
+        },
+        watch: {
+            number(newVal) {
+               TweenLite.to(this.$data, 2, { tweenedNumber: newVal });
+            },
+            // color: function () {
+            //     function animate () {
+            //         if (TWEEN.update()) {
+            //         requestAnimationFrame(animate)
+            //         }
+            //     }
+
+            //     new TWEEN.Tween(this.tweenedColor)
+            //         .to(this.color, 1000)
+            //         .start()
+
+            //     animate()
+            // }
+        },
+        methods: {
+            // updateColor: function (theColor) {
+            //     this.color = new Color(theColor).toRGB()
+            //     this.colorQuery = ''
+            // }
+        },
+        mounted() {
+            this.number = 80
+            // if(this.number<30) {this.updateColor('green')}
+            // else if(this.number>=30 && this.number<70) {this.updateColor('yellow')}
+            // else {this.updateColor('red')}
+            // this.updateColor('red')
+        }
     }
 </script>
 
 <style lang="less">
     #home {
-        height: 100%;
+        
         .test-header {
             display: flex;
-            // justify-content: center;
             align-items: center;
             flex-direction: column;
             height: 400px;
-            padding: 60px 0;
-            background-color: rgb(167, 193, 231);
-            .circle {
-                width: 200px;
-                height: 200px;
-                border-radius: 50%;
-                background-color: #fff;
+            // padding: 60px 0;
+            background-color: rgb(171, 224, 248);
+            // animation: circleColor 3s;
+            // .circle {
+            //     width: 200px;
+            //     height: 200px;
+            //     border-radius: 50%;
+            //     background-color: #fff;
+            // }
+            .header {
+                font-weight: 600;
+                font-size: 22px;
             }
             .data-box {
                 margin-top: 20px;
@@ -63,18 +151,39 @@
             }
         }
         .test-container {
-            height: calc(100% - 400px);
+            // height: calc(100% - 400px);
             padding: 10px;
             background-color: #eee;
             .test-item {
-                height: 100px;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                padding: 0 40px;
                 background-color: #fff;
                 margin-top: 10px;
                 border-radius: 4px;
+                .item-text {
+                    width: 100%;
+                    height: 66px;
+                    border: 1px solid #000;
+                    margin-left: 20px;
+                    .header {
+                        height: 30px;
+                        font-size: 20px;
+                        font-weight: 500;
+                    }
+                    .footer {
+
+                    }
+                }
                 &:first-child {
                     margin-top: 0px;
                 }
             }
         }
+        // @keyframes circleColor {
+        //     from {background-color: yellow;}
+        //     to {background-color: red;}
+        // }
     }
 </style>
