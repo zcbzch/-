@@ -25,7 +25,8 @@
                 </el-progress>
                 <div class="item-text">
                     <div class="header">血糖危机指数</div>
-                    <div class="footer">血糖过高，请就医。77777777777777</div>
+                    <!-- <div class="line"></div> -->
+                    <div class="footer">7777777777777777777777777777777777777</div>
                 </div>
            </div>
            <div class="test-item">
@@ -36,7 +37,11 @@
                     :color="circleColor" 
                     :percentage="66">
                 </el-progress>
-                血压
+                <div class="item-text">
+                    <div class="header">血压危机指数</div>
+                    <!-- <div class="line"></div> -->
+                    <div class="footer">7777777777777777777777777777777777777</div>
+                </div>
            </div>
        </div>
        
@@ -163,17 +168,25 @@
                 margin-top: 10px;
                 border-radius: 4px;
                 .item-text {
-                    width: 100%;
-                    height: 66px;
-                    border: 1px solid #000;
+                    width: calc(100% - 80px);
+                    height: 100%;
+                    padding: 20px;
+                    text-align: left;
+                    // border: 1px solid #000;
                     margin-left: 20px;
+                    // .line {
+                    //     width: 100%;
+                    //     height: 1px;
+                    //     margin-bottom: 5px;
+                    //     background-color: rgba(0, 0, 0, 0.5);
+                    // }
                     .header {
-                        height: 30px;
+                        height:50%;
                         font-size: 20px;
-                        font-weight: 500;
+                        font-weight: 600;
                     }
                     .footer {
-
+                        word-wrap: break-word;
                     }
                 }
                 &:first-child {
