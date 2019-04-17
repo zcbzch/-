@@ -3,8 +3,7 @@
         <router-view></router-view>
         <mt-tabbar v-model="active" fixed>
             <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
-                <span class="iconfont">&#xeb66;</span>
-                <!-- <img slot="icon" :src="require(`@/assets/iconfont1/${item.name}.svg`)">{{ item.label }} -->
+                <i class="icon iconfont icon-size" :class="item.icon"></i>
             </mt-tab-item>
         </mt-tabbar>
         <div class="bottom-block"></div>
@@ -21,14 +20,17 @@
                     {
                         name: 'home',
                         label: '主页',
+                        icon: 'icon-icon_wangye',
                     },
                     {
                         name: 'detail',
                         label: '详细',
+                        icon: 'icon-shujukanban'
                     },
                     {
                         name: 'user',
                         label: '用户',
+                        icon: 'icon-icon_zhanghao',
                     },
                 ]
             }
@@ -49,11 +51,15 @@
             background-color: #fff;
         }
         .mint-tab-item {
+            padding: 16px;
             background-color: #fff;
+        }
+        .icon-size {
+            font-size: 24px;
         }
         .bottom-block {
             width: 100%;
-            height: 55px;
+            height: 56px;
         }
     }
 </style>
