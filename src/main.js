@@ -6,6 +6,7 @@ import Mint from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import '@/assets/iconfont/iconfont.css' // iconfont
 
 Vue.use(Mint)
 Vue.use(Element)
