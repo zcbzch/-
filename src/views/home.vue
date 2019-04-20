@@ -4,15 +4,19 @@
            <p class="header">危机指数</p>
            <el-progress 
                 type="circle" 
-                :width='160' 
+                :width='200' 
                 :stroke-width='10' 
-                :color="circleColor" 
-                :percentage="animatedNumber">
+                :color="healthStatus(riskNumSet.mutiple.number).color" 
+                :percentage="riskNum"
+                status="text">
+                <div class="circle-text">
+                    <div class="circle-text-container">
+                        <p class="num">{{ riskNum }}</p>
+                        <p class="tip">{{ healthStatus(riskNumSet.mutiple.number).tip }}</p>
+                        <el-button size="mini" round @click="$_getRiskNum">健康检测</el-button>
+                    </div>
+                </div>
             </el-progress>
-           <!-- <div class="data-box">
-               <div class="box-item"><div class="status-circle"></div>血糖</div>
-               <div class="box-item"><div class="status-circle"></div>血压</div>
-           </div> -->
        </div>
        <div class="test-container">
            <div class="test-item">
@@ -20,8 +24,12 @@
                     type="circle" 
                     :width='60' 
                     :stroke-width='6' 
-                    :color="circleColor" 
-                    :percentage="85">
+                    :color="healthStatus(riskNumSet.bloodSugar.number).color" 
+                    :percentage="riskNum_sugar"
+                    status="text">
+                    <p style="font-size: 20px">
+                        {{ riskNum_sugar }}
+                    </p>
                 </el-progress>
                 <div class="item-text">
                     <div class="header">血糖危机指数</div>
@@ -34,8 +42,12 @@
                     type="circle" 
                     :width='60' 
                     :stroke-width='6' 
-                    :color="circleColor" 
-                    :percentage="66">
+                    :color="healthStatus(riskNumSet.bloodPressure.number).color" 
+                    :percentage="riskNum_pressure"
+                    status="text">
+                    <p style="font-size: 20px">
+                        {{ riskNum_pressure }}
+                    </p>
                 </el-progress>
                 <div class="item-text">
                     <div class="header">血压危机指数</div>
@@ -49,70 +61,78 @@
 </template>
 
 <script>
-// import { parse } from 'path';
-    // var Color = net.brehaut.Color
     export default {
         name: 'home',
         data() {
             return {
-                number: 0,
-                tweenedNumber: 0,
+                // number: 0,
+                // tweenedNumber: 0,
+                riskNumSet: {
+                    mutiple: {
+                        number: 0,
+                        tweenedNumber: 0,
+                    },
+                    bloodSugar: {
+                        number: 0,
+                        tweenedNumber: 0,
+                    },
+                    bloodPressure: {
+                        number: 0,
+                        tweenedNumber: 0,
+                    },
+                }
             }
         },
         created: function () {
             // this.tweenedColor = Object.assign({}, this.color)
         },
         computed: {
-            animatedNumber() {
-                return parseInt(this.tweenedNumber.toFixed())
+            riskNum() {
+                return parseInt(this.riskNumSet.mutiple.tweenedNumber.toFixed())
             },
-            circleColor() {
-                let x = this.number
-                switch(true) {
-                    case x < 30: return 'green'
-                    case x < 70 && x >= 30: return 'yellow'
-                    case x >= 70: return 'red'
-                }
+            riskNum_sugar() {
+                return parseInt(this.riskNumSet.bloodSugar.tweenedNumber.toFixed())
+            },
+            riskNum_pressure() {
+                return parseInt(this.riskNumSet.bloodPressure.tweenedNumber.toFixed())
             }
-            // tweenedCSSColor: function () {
-            //     return new Color({
-            //         red: this.tweenedColor.red,
-            //         green: this.tweenedColor.green,
-            //         blue: this.tweenedColor.blue,
-            //         yellow: this.tweenedColor.yellow,
-            //     }).toCSS()
-            // }
         },
         watch: {
-            number(newVal) {
-               TweenLite.to(this.$data, 2, { tweenedNumber: newVal });
+            'riskNumSet.mutiple.number'(newVal) {
+               TweenLite.to(this.$data.riskNumSet.mutiple, 2, { tweenedNumber: newVal });
             },
-            // color: function () {
-            //     function animate () {
-            //         if (TWEEN.update()) {
-            //         requestAnimationFrame(animate)
-            //         }
-            //     }
+            'riskNumSet.bloodSugar.number'(newVal) {
+               TweenLite.to(this.$data.riskNumSet.bloodSugar, 2, { tweenedNumber: newVal });
+            },
+            'riskNumSet.bloodPressure.number'(newVal) {
+               TweenLite.to(this.$data.riskNumSet.bloodPressure, 2, { tweenedNumber: newVal });
+            },
 
-            //     new TWEEN.Tween(this.tweenedColor)
-            //         .to(this.color, 1000)
-            //         .start()
-
-            //     animate()
-            // }
         },
         methods: {
-            // updateColor: function (theColor) {
-            //     this.color = new Color(theColor).toRGB()
-            //     this.colorQuery = ''
-            // }
+            healthStatus(num) {
+                let x = num
+                switch(true) {
+                    case x < 40: return {color: 'green', tip: '身体健康，继续保持'}
+                    case x < 70 && x >= 40: return {color: 'yellow', tip: '健康预警，注意身体'}
+                    case x >= 70: return {color: 'red', tip: '身体危险，请就医'}
+                }
+            },
+            $_getRiskNum() {
+                this.$store.state.riskNum = {
+                    mutiple: 80,
+                    bloodSugar: 60,
+                    bloodPressure: 90,
+                }
+                for(let item in this.riskNumSet) {
+                    this.riskNumSet[item].number = this.$store.state.riskNum[item]
+                }
+            },
         },
         mounted() {
-            this.number = 80
-            // if(this.number<30) {this.updateColor('green')}
-            // else if(this.number>=30 && this.number<70) {this.updateColor('yellow')}
-            // else {this.updateColor('red')}
-            // this.updateColor('red')
+            for(let item in this.riskNumSet) {
+                this.riskNumSet[item].number = this.$store.state.riskNum[item]
+            }
         }
     }
 </script>
@@ -125,33 +145,28 @@
             align-items: center;
             flex-direction: column;
             height: 400px;
-            // padding: 60px 0;
-            background-color: rgb(171, 224, 248);
-            // animation: circleColor 3s;
-            // .circle {
-            //     width: 200px;
-            //     height: 200px;
-            //     border-radius: 50%;
-            //     background-color: #fff;
-            // }
+            background: linear-gradient(rgb(118, 218, 243),rgb(97, 236, 160));
             .header {
                 font-weight: 600;
                 font-size: 22px;
             }
-            .data-box {
-                margin-top: 20px;
-                // background-color: #fff;
-                display: flex;
-                .box-item {
-                    width: 80px;
-                    display: flex;
-                    .status-circle {
-                        width: 20px;
-                        height: 20px;
-                        margin-right: 5px;
-                        border-radius: 50%;
-                        background-color: red;
-                    }
+            .circle-text {
+                width: 120px;
+                height: 100px;
+                margin: auto;
+                // .circle-text-container {
+                //     animation: movedown 1s;
+                // }
+                p {
+                    margin: 0;
+                }
+                .num {
+                    font-size: 40px;
+                    font-weight: 600;
+                }
+                .tip {
+                    margin: 6px;
+                    font-size: 12px;
                 }
             }
         }
@@ -194,9 +209,9 @@
                 }
             }
         }
-        // @keyframes circleColor {
-        //     from {background-color: yellow;}
-        //     to {background-color: red;}
-        // }
+        @keyframes movedown {
+            from { transform: translateY(0) }
+            to {  transform: translateY(20%) }
+        }
     }
 </style>
