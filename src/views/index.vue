@@ -3,7 +3,7 @@
         <router-view></router-view>
         <mt-tabbar v-model="active" fixed>
             <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
-                <i class="icon iconfont icon-size" :class="item.icon"></i>
+                <i class="icon iconfont icon-layout" :class="item.icon"></i>
             </mt-tab-item>
         </mt-tabbar>
         <div class="bottom-block"></div>
@@ -54,7 +54,7 @@
             padding: 16px;
             background-color: #fff;
         }
-        .icon-size {
+        .icon-layout {
             font-size: 24px;
         }
         .bottom-block {

@@ -139,7 +139,7 @@
 
 <style lang="less">
     #home {
-        
+       
         .test-header {
             display: flex;
             align-items: center;
@@ -171,8 +171,7 @@
             }
         }
         .test-container {
-            // height: calc(100% - 400px);
-            padding: 10px;
+            padding: 10px 0;
             background-color: #eee;
             .test-item {
                 height: 120px;
@@ -187,14 +186,7 @@
                     height: 100%;
                     padding: 20px;
                     text-align: left;
-                    // border: 1px solid #000;
                     margin-left: 20px;
-                    // .line {
-                    //     width: 100%;
-                    //     height: 1px;
-                    //     margin-bottom: 5px;
-                    //     background-color: rgba(0, 0, 0, 0.5);
-                    // }
                     .header {
                         height:50%;
                         font-size: 20px;
