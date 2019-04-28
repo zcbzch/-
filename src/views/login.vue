@@ -1,32 +1,68 @@
 <template>
     <div id="login">
         <div class="header">
-            <div class="left"><i class="el-icon-arrow-left"></i></div>
+            <div class="left" @click="$_routerBack()"><i class="el-icon-arrow-left"></i></div>
             <!-- <div class="right">明细</div> -->
         </div>
         <div class="container">
             <p class="login-title">账号登录</p>
             <div class="input-layout">
-                <input class="input-style" type="text" placeholder="请输入帐号">
+                <input class="input-style" 
+                    type="text" 
+                    placeholder="请输入帐号" 
+                    v-model="userData.username">
             </div>
             <div class="input-layout">
-                <input class="input-style" type="password" placeholder="请输入密码">
+                <input class="input-style" 
+                    type="password" 
+                    placeholder="请输入密码" 
+                    v-model="userData.password">
             </div>
-        <mt-button type="primary" size="large" disabled="" style="width:100%;margin-top:20px">登录</mt-button>
+            <mt-button type="primary" 
+                size="large" 
+                :disabled="!notEmpty"
+                style="width:100%; margin-top:20px"
+                @click="$_login()">
+                登录
+            </mt-button>
         </div>
     </div>
 </template>
 
 <script>
+import { constants } from 'crypto';
 export default {
     name: 'login',
     data() {
         return {
-
+            userData: {
+                username: '',
+                password: '',
+            }
         }
     },
+    computed: {
+        notEmpty() {
+            return this.userData.username.length > 0 && this.userData.password.length > 0
+        },
+    },
     methods: {
-
+        $_login() {
+            let params = {
+                username: this.userData.username,
+                password: this.userData.password,
+            }
+            this.axios.post('/user/login', params)
+                .then((res) => { 
+                    console.log(res) 
+                })
+                .catch((error) => {  
+                    console.log(error)
+                })
+        },
+        $_routerBack() {
+            this.$router.back()
+        }
     }
 }
 </script>
@@ -39,9 +75,10 @@ export default {
             height: 60px;
             line-height: 60px;
             .left {
+                width: 60px;
                 font-size: 28px;
                 position: absolute;
-                left: 20px;
+                left: 0;
             }
             .right {
                 position: absolute;
