@@ -15,6 +15,8 @@ var common = require('./lib/common.js')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var session = require('../server/data/session.js')
+
 var app = express();
 
 // view engine setup
@@ -28,8 +30,9 @@ app.use(cookieParser());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session)
 
-app.use('/home', indexRouter);
+app.use('/index', indexRouter);
 app.use('/users', usersRouter);
 
 // app.post('/users/test', (req, res) => {

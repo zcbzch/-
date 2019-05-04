@@ -139,7 +139,8 @@
 
 <style lang="less">
     #home {
-       
+        height: 100%;
+        overflow: scroll;
         .test-header {
             display: flex;
             align-items: center;

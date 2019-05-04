@@ -1,12 +1,16 @@
 <template>
     <div id="index">
-        <router-view></router-view>
-        <mt-tabbar v-model="active" fixed>
-            <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
-                <i class="icon iconfont icon-layout" :class="item.icon"></i>
-            </mt-tab-item>
-        </mt-tabbar>
-        <div class="bottom-block"></div>
+        <div class="container">
+            <router-view></router-view>
+        </div>
+
+        <div class="bottom-block">
+            <mt-tabbar v-model="active" fixed>
+                <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
+                    <i class="icon iconfont icon-layout" :class="item.icon"></i>
+                </mt-tab-item>
+            </mt-tabbar>
+        </div>
     </div>
 </template>
 
@@ -47,15 +51,18 @@
 <style lang="less">
     #index{
         font-family: 'iconfont';
-        .is-selected {
-            background-color: #fff;
-        }
-        .mint-tab-item {
-            padding: 16px;
-            background-color: #fff;
-        }
-        .icon-layout {
-            font-size: 24px;
+        .container {
+            height: calc(100% - 56px);
+            .is-selected {
+                background-color: #fff;
+            }
+            .mint-tab-item {
+                padding: 16px;
+                background-color: #fff;
+            }
+            .icon-layout {
+                font-size: 24px;
+            }
         }
         .bottom-block {
             width: 100%;
