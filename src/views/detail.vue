@@ -3,8 +3,10 @@
         <mt-navbar v-model="selected">
             <mt-tab-item v-for="(item, index) in navItem" :key="index" :id="item.name">{{ item.label }}</mt-tab-item>
         </mt-navbar>
-       <div class="line"></div>
-       <router-view></router-view>
+        <div class="line"></div>
+        <div class="card">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 

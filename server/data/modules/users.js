@@ -3,9 +3,9 @@ var pool = require('../connectPool.js');
 var users = {
     getUserList(data, callback) {
         pool.getConnection((err, connection) => {
-            var sql = `select username from login where username = "${data.username}" and password = "${data.password}"`
+            var sql = `select user_id, username from login where username = "${data.username}" and password = "${data.password}"`
             connection.query(sql, (err, data) => {
-                if(err) throw err
+                if(err) console.log(error)
                 data = JSON.stringify(data)
                 data = JSON.parse(data)
                 callback(data)

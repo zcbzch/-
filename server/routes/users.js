@@ -1,18 +1,23 @@
 var express = require('express');
 var router = express.Router();
 var users = require('../data/modules/users.js')
+var jwt = require('jsonwebtoken');
 
-router.post('/login' ,(req, res) => {
+router.post('/login', async (req, res) => {
   var userData = req.body
   users.getUserList(userData, (data) => {
-    // console.log(req.session.username)
     if(data.length) {
-      if(!req.session.username) {
-        req.session.username = data[0].username
+      var token = jwt.sign({
+          name: data[0].username,
+          id: data[0].user_id,
+      }, 'health', {
+          expiresIn: '2h'
+      })
+      data = {
+          username: data[0].username,
+          token: token
       }
-      // console.log(req.sessionID)
-      data[0]['session_id'] = req.sessionID
-      result = common.success('成功', data)
+      result = common.success('登录成功', data)
       res.send(result)
     } else {
       result = common.error('用户名或密码错误')

@@ -4,7 +4,7 @@ var router = express.Router();
 //综合
 router.get('/mutiple', (req, res) => {
   if(req.headers.authorization == req.sessionID) {
-    console.log(req.session.username)
+    // console.log(req.session.username)
     var m = 40
     result = common.success('成功', m)
     res.send(result)

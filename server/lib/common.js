@@ -1,7 +1,10 @@
 var common = {
-    success: (msg, data) => {
+    success: (msg, data, toObject = 0) => {
         data = JSON.stringify(data)
         data = JSON.parse(data)
+        if(toObject) {
+            data = (new Function("return " + data))()
+        }
         return {
             code: 200000,
             message: msg,

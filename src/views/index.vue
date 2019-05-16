@@ -5,7 +5,7 @@
         </div>
 
         <div class="bottom-block">
-            <mt-tabbar v-model="active" fixed>
+            <mt-tabbar v-model="active">
                 <mt-tab-item v-for="(item, index) in tabItem" :key="index" :id="item.name">
                     <i class="icon iconfont icon-layout" :class="item.icon"></i>
                 </mt-tab-item>
@@ -50,9 +50,15 @@
 
 <style lang="less">
     #index{
+        height: 100%;
         font-family: 'iconfont';
         .container {
             height: calc(100% - 56px);
+            overflow: scroll;
+        }
+        .bottom-block {
+            width: 100%;
+            height: 56px;
             .is-selected {
                 background-color: #fff;
             }
@@ -63,10 +69,6 @@
             .icon-layout {
                 font-size: 24px;
             }
-        }
-        .bottom-block {
-            width: 100%;
-            height: 56px;
         }
     }
 </style>

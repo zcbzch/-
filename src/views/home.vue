@@ -33,7 +33,6 @@
                 </el-progress>
                 <div class="item-text">
                     <div class="header">血糖危机指数</div>
-                    <!-- <div class="line"></div> -->
                     <div class="footer">7777777777777777777777777777777777777</div>
                 </div>
            </div>

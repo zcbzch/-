@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store.js'
 
 Vue.use(Router)
 
@@ -10,7 +11,9 @@ export default new Router({
             path: '/',
             name: 'index',
             component: () => import('@/views/index.vue'),
-            redirect: { name: 'home' },
+            redirect: to => {
+                return { name: 'home' }
+            },
             children: [
                 {
                     path: '/home',
@@ -38,12 +41,23 @@ export default new Router({
                             name: 'heart-rate',
                             component: () => import('@/views/detail/heart-rate.vue'),
                         },
+                        
                     ]
                 },
                 {
                     path: '/user',
                     name: 'user',
                     component: () => import('@/views/user.vue'),
+                },
+                {
+                    path: 'blood-sugar-data',
+                    name: 'blood-sugar-data',
+                    component: () => import('@/views/user/blood-sugar-data.vue'),
+                },
+                {
+                    path: 'blood-pressure-data',
+                    name: 'blood-pressure-data',
+                    component: () => import('@/views/user/blood-pressure-data.vue'),
                 },
             ]
         },

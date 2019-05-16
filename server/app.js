@@ -13,9 +13,10 @@ var bodyParser = require('body-parser');
 // var FileStore = require('session-file-store')(session);
 var common = require('./lib/common.js')
 var indexRouter = require('./routes/index');
+var detailRouter = require('./routes/detail');
 var usersRouter = require('./routes/users');
-
-var session = require('../server/data/session.js')
+var expressJWT = require('express-jwt');
+// var session = require('../server/data/session.js')
 
 var app = express();
 
@@ -30,11 +31,39 @@ app.use(cookieParser());
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session)
+// app.use(session)
+
+app.use(expressJWT({
+    secret: 'health'
+}).unless({
+    path: [
+      {
+        url: '/users/login', 
+        methods: ['POST']
+      }
+    ]
+}))
+
+app.use((req, res, next) => {
+    var token = req.headers['authorization']
+    console.log(token)
+    next()
+})
 
 app.use('/index', indexRouter);
+app.use('/detail', detailRouter);
 app.use('/users', usersRouter);
 
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.header('Access-Control-Allow-Methods', '*');
+    res.header('Content-Type', 'application/json;charset=utf-8');
+    next();
+})
+
+
+//处理json数据，UTF-8数据. row-Buffer流数据，text-文本数据
 // app.post('/users/test', (req, res) => {
 //   console.log(req.body)
 // })
@@ -81,4 +110,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {   
+      res.status(401).send('invalid token...');
+    }
+});
 module.exports = app;

@@ -2,7 +2,6 @@
     <div id="login">
         <div class="header">
             <div class="left" @click="$_routerBack()"><i class="el-icon-arrow-left"></i></div>
-            <!-- <div class="right">明细</div> -->
         </div>
         <div class="container">
             <p class="login-title">账号登录</p>
@@ -30,7 +29,6 @@
 </template>
 
 <script>
-import { constants } from 'crypto';
 export default {
     name: 'login',
     data() {
@@ -45,6 +43,9 @@ export default {
         notEmpty() {
             return this.userData.username.length > 0 && this.userData.password.length > 0
         },
+        username() {
+            return sessionStorage.getItem('username')
+        }
     },
     methods: {
         $_login() {
@@ -52,16 +53,23 @@ export default {
                 username: this.userData.username,
                 password: this.userData.password,
             }
-            this.axios.post('/user/login', params)
-                .then((res) => { 
-                    console.log(res) 
+            this.axios.post('/users/login', params)
+                .then((res) => {
+                    res = res.data
+                    if (res.code = 200000) {
+                        sessionStorage.setItem(`username`, res.data.username)
+                        sessionStorage.setItem(`userID`, res.data.token)
+                        this.axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('userID')}`
+                        // this.$store.state.route = 'user'
+                        this.$router.replace({ name: 'user' })
+                    }
                 })
                 .catch((error) => {  
                     console.log(error)
                 })
         },
         $_routerBack() {
-            this.$router.back()
+            this.$router.push({ name: 'user' })
         }
     }
 }
