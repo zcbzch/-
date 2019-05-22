@@ -44,11 +44,21 @@ app.use(expressJWT({
     ]
 }))
 
-app.use((req, res, next) => {
-    var token = req.headers['authorization']
-    console.log(token)
-    next()
-})
+// app.use((req, res, next) => {
+//     let token = req.headers['authorization']
+//     if(!token) next()
+//     handleData()
+//     function handleData() {
+//       let firstIndex = token.indexOf(".")
+//       let lastIndex = token.lastIndexOf(".")
+//       let payLoad = token.slice(firstIndex + 1, lastIndex)
+//       let buffer = new Buffer.from(payLoad, 'base64')
+//       let obj = buffer.toString()
+//       req['username'] = obj.name
+//     }
+//     console.log(req.user.name)
+//     next()
+// })
 
 app.use('/index', indexRouter);
 app.use('/detail', detailRouter);
@@ -100,19 +110,19 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// app.use(function(err, req, res, next) {
+//   // set locals, only providing error in development
+//   res.locals.message = err.message;
+//   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+//   // render the error page
+//   res.status(err.status || 500);
+//   res.render('error');
+// });
 
-app.use(function (err, req, res, next) {
-    if (err.name === 'UnauthorizedError') {   
-      res.status(401).send('invalid token...');
-    }
-});
+// app.use(function (err, req, res, next) {
+//     if (err.name === 'UnauthorizedError') {   
+//       res.status(401).send('invalid token...');
+//     }
+// });
 module.exports = app;

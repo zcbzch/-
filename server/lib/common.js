@@ -1,10 +1,13 @@
 var common = {
+    stringToObj: str => {
+        return (new Function("return " + str))()
+    },
     success: (msg, data, toObject = 0) => {
         data = JSON.stringify(data)
         data = JSON.parse(data)
-        if(toObject) {
-            data = (new Function("return " + data))()
-        }
+        // if(toObject) {
+        //     data = (new Function("return " + data))()
+        // }
         return {
             code: 200000,
             message: msg,

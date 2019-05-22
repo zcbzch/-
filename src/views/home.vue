@@ -64,8 +64,6 @@
         name: 'home',
         data() {
             return {
-                // number: 0,
-                // tweenedNumber: 0,
                 riskNumSet: {
                     mutiple: {
                         number: 0,
@@ -118,17 +116,67 @@
                 }
             },
             $_getRiskNum() {
-                this.$store.state.riskNum = {
-                    mutiple: 80,
-                    bloodSugar: 60,
-                    bloodPressure: 90,
-                }
-                for(let item in this.riskNumSet) {
-                    this.riskNumSet[item].number = this.$store.state.riskNum[item]
-                }
+                this.axios.get('/index/mutiple')
+                    .then((res => {
+                        let data = res.data.data
+                        console.log(data)
+                        this.riskNumSet.bloodSugar.number = data.riskNum
+                    }))
+                // let params = {
+                //     username: sessionStorage.getItem('username')
+                // }
+                // this.axios.get('/detail/blood-sugar', { params: params })
+                // .then((res) => {
+                //     let data = res.data.data
+                //     let a = handleData(data)
+                //     let b = caculateRiskNum(a)
+                //     console.log(b)
+                //     this.riskNumSet.bloodSugar.number = b
+                //     // console.log('test')
+                // })
+                // .catch((error) => {
+                //     console.log(error)
+                // })
+                //早中晚平均数,凌晨平均数
+                // function handleData(array) {
+                // let average = {
+                //     emptyStomach: 0,
+                //     beforeDawn: 0,
+                // }
+                // // console.log(average)
+                // for(let i of array) {
+                //     average.beforeDawn += parseFloat(i.data[0])
+                //     average.emptyStomach += parseFloat(i.data[1]) + parseFloat(i.data[2]) + parseFloat(i.data[3])
+                // }
+                // average.beforeDawn = Math.round((average.beforeDawn / 30) * 100) / 100
+                // average.emptyStomach = Math.round((average.emptyStomach / 90) * 100) / 100
+                // console.log(average)
+                
+                // return average
+                // }
+                // //危险度计算
+                // function caculateRiskNum(object) {
+                // let m = object.emptyStomach
+                // if(m > 6.1 && m <= 8.4) {
+                //     m = (m - 5) / 1.7 + 1
+                //     m = Math.pow(m, -2)
+                //     m = 1 / m
+                // } else if(m > 3.9 && m <= 6.1) {
+                //     m = Math.pow(m - 5, 4)
+                // } else if(m <= 3.9) {
+                //     m = (5 - m) / 1.7 + 1
+                //     m = Math.pow(m, -2)
+                //     m = 1 / m
+                // }
+                // return Math.round(m * 100)
+                // }
+                // for(let item in this.riskNumSet) {
+                //     this.riskNumSet[item].number = this.$store.state.riskNum[item]
+                // }
             },
         },
         mounted() {
+            this.$_getRiskNum()
             for(let item in this.riskNumSet) {
                 this.riskNumSet[item].number = this.$store.state.riskNum[item]
             }

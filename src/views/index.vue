@@ -39,11 +39,23 @@
                 ]
             }
         },
+        methods: {
+            $_isLogin() {
+                if(Boolean(sessionStorage.getItem('username'))) return
+                else {
+                    this.$router.push({name: 'login'})
+                }
+            },
+        },
         watch: {
             active: {
                 handler(newVal, oldVal) { this.$router.push({ name:newVal })},
                 immediate: true
             }
+        },
+        mounted() {
+            this.$_isLogin()
+            this.axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('userID')}`
         }
     }
 </script>

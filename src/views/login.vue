@@ -36,6 +36,12 @@ export default {
             userData: {
                 username: '',
                 password: '',
+            },
+            userInformation: {
+                sex: '',
+                age: null,
+                weight: null,
+                height: null,
             }
         }
     },
@@ -57,10 +63,13 @@ export default {
                 .then((res) => {
                     res = res.data
                     if (res.code = 200000) {
+                        if(!res.data.username || !res.data.token) {
+                            return
+                        }
                         sessionStorage.setItem(`username`, res.data.username)
                         sessionStorage.setItem(`userID`, res.data.token)
+
                         this.axios.defaults.headers.common['Authorization'] = `Bearer ${sessionStorage.getItem('userID')}`
-                        // this.$store.state.route = 'user'
                         this.$router.replace({ name: 'user' })
                     }
                 })

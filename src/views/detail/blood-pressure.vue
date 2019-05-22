@@ -11,7 +11,7 @@
 </script>
 
 <style lang="less">
-    .blood-pressure{
+    #blood-pressure{
         
     }
 </style>

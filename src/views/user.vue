@@ -7,7 +7,7 @@
                    <i class="iconfont icon-icon_zhanghao icon-layout"></i>
                 </div>
            </div>
-           <div class="bottom" @click="$_routeToLogin">立即登录</div>
+           <div class="bottom" @click="$_routeToLogin">{{ username.length > 0 ? '登出':'立即登录' }}</div>
         </div>
 
         <div class="user-information">
@@ -19,7 +19,7 @@
        
         <div class="user-operation">
             <div class="item"><div class="item-inside" @click="() => { this.$router.push({name: 'blood-sugar-data'}) }">血糖详细数据</div></div>
-            <div class="item"><div class="item-inside">血压详细数据</div></div>
+            <div class="item"><div class="item-inside" @click="() => { this.$router.push({name: 'blood-pressure-data'}) }">血压详细数据</div></div>
             <div class="item"><div class="item-inside">血糖数据</div></div>
         </div>
 
@@ -33,6 +33,7 @@
         data() {
             return {
                 userData: {
+                    username: '',
                     sex: '',
                     age: '',
                     height: '',
@@ -42,13 +43,34 @@
         },
         computed: {
             username() {
-                return this.$store.state.username
+                return sessionStorage.username
             }
         },
         methods: {
-            $_routeToLogin() {
-                this.$router.push({ name: 'login' })
+            $_getUserInformation() {
+                let params = { username: this.username }
+                // console.log(params)
+                this.axios.get('/users/information', { params: params })
+                    .then(res => {
+                        res = res.data
+                        if(res.code = 200000) {
+                            this.userData = res.data
+                            console.log(this.userData)
+                        }
+                    })
             },
+            $_routeToLogin() {
+                console.log('click login')
+                if(this.username.length > 0) {
+                    sessionStorage.clear()
+                    this.$router.push({ name: 'login' })
+                } else {
+                    this.$router.push({ name: 'login' })
+                }
+            },
+        },
+        mounted() {
+            this.$_getUserInformation()
         }
     }
 </script>
@@ -85,6 +107,13 @@
                 height: 60px;
                 line-height: 60px;
                 
+            }
+        }
+
+        .user-information {
+            .mint-field-core {
+                text-align: right;
+                padding-right: 30px;
             }
         }
 

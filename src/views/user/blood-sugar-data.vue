@@ -2,7 +2,7 @@
     <div id="blood-sugar-data">
         <div class="header">
             <div class="left" @click="() => {this.$router.back()}"><i class="el-icon-arrow-left"></i></div>
-            
+            {{ `血糖记录` }}
         </div>
         <div class="row">
             <div class="dateTime">日期</div>
@@ -41,7 +41,7 @@ export default {
         },
         $_getData: async function() {
             let params = {
-                username: 'lisi'
+                username: sessionStorage.getItem('username')
             }
             this.axios.get('/detail/blood-sugar', { params: params })
                 .then((res) => {
@@ -86,14 +86,14 @@ export default {
                 @flex-center();
                 width: 20%;
                 height: 44px;
-                border-top: 1px solid #000;
-                background-color: #eee;
+                border-top: 1px solid #DCDFE6;
+                background-color: #F2F6FC;
             }
             .dayTime {
                 @flex-center();
                 width: 20%;
                 height: 40px;
-                border-top: 1px solid #000;
+                border-top: 1px solid #DCDFE6;
             }
         }
     }

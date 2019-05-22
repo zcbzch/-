@@ -8,36 +8,42 @@
                 <canvas class="myChart" height="80%" width="80%"></canvas>
                 <div class="chart-form">
                     <div class="header">
-                        <div class="item">平均值 <span class="word">{{ item.average.average }}</span>mmol/L</div>
-                        <div class="item">模拟糖化 <span class="word">{{ item.average.imitate }}</span>%</div>
+                        <div class="item">
+                            <div class="left">平均值</div>
+                            <div class="right">
+                                <span class="word">{{ item.average.average }}</span>
+                                <div class="float">mmol/L</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="left">模拟糖化</div>
+                            <div class="right">
+                                <span class="word">{{ item.average.imitate }}</span>
+                                <div class="float">%</div>
+                            </div>
+                        </div>
                     </div>
                     <div class="context">
-                        <div class="item">
-                            <el-tag type="success">正常 {{ item.classify.mediumRate }}% | {{ item.classify.mediumTime }}次</el-tag>
+                        <div class="left">
+                            <div class="item">
+                                <el-tag type="success">正常 {{ item.classify.mediumRate }}% | {{ item.classify.mediumTime }}次</el-tag>
+                            </div>
+                            <div class="item">
+                                <el-tag type="danger">过高 {{ item.classify.highRate }}% | {{ item.classify.highTime }}次</el-tag>
+                            </div>
+                            <div class="item">
+                                <el-tag type="warning">过低 {{ item.classify.lowRate }}% | {{ item.classify.lowTime }}次</el-tag>
+                            </div>
                         </div>
-                        <div class="item">
-                            <el-tag type="danger">过高 {{ item.classify.highRate }}% | {{ item.classify.highTime }}次</el-tag>
-                        </div>
-                        <div class="item">
-                            <el-tag type="warning">过低 {{ item.classify.lowRate }}% | {{ item.classify.lowTime }}次</el-tag>
+                        <div class="right">
+                            <canvas class="pieChart" height="100" width="100"></canvas>
+                            <div class="text">测量次数 {{ item.classify.totalTime }}次</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-<!-- 
-        <div class="add-data">
-            <div class="devide-line">添加血糖数据</div>
-            <mt-cell title="日期" is-link @click="getDate()"></mt-cell>
-            <mt-datetime-picker
-                v-model="pickerVisible"
-                ref="picker"
-                type="date"
-                year-format="{value} 年"
-                month-format="{value} 月"
-                date-format="{value} 日">
-            </mt-datetime-picker>
-        </div> -->
+
     </div>
 </template>
 
@@ -50,7 +56,7 @@
                 chartData: [
                     {
                         label: '最近三天',
-                        data: [3.1, 6.8, 5.3, 3.1, 6.8, 5.3, 3.1, 6.8, 5.3],
+                        data: [],
                         average: {
                             average: null,
                             imitate: null,
@@ -62,17 +68,18 @@
                             highTime: null,
                             mediumTime: null,
                             lowTime: null,
+                            totalTime: null,
                         }
                     },
                     {
                         label: '最近七天',
-                        data: [4.1, 6.0, 5.0, 6.7, 7.2, 5.7, 6.0, 4.1, 6.0, 5.0, 6.7, 7.2, 5.7, 6.0, 4.1, 6.0, 5.0, 6.7, 7.2, 5.7, 6.0],
+                        data: [],
                         average: {},
                         classify: {}
                     },
                     {
                         label: '最近一月',
-                        data: [3.1, 6.8, 5.3, 6.2, 6.2, 6.7, 5.0],
+                        data: [],
                         average: {},
                         classify: {}
                     },
@@ -89,9 +96,13 @@
             minData() {
                 let min = Math.min.apply(null, this.chartData[2].data) - 1
                 return parseFloat(min.toFixed(1)) 
+            },
+            isGetData() {
+                return this.data.length
             }
         },
         methods: {
+            //正常，过高，过低的次数及百分比
             $_classify(data) {
                 let tmp = {
                     high: [],
@@ -107,17 +118,20 @@
                         tmp.medium.push(i)
                     } 
                 })
-                let p = {}, time = {}
+                let p = {}, time = {}, total = 0
                 for(let i in tmp) {
                     let d = (tmp[i].length / data.length).toFixed(4) * 100
                     d == 0 ? p[`${i}Rate`] = `00.00` : p[`${i}Rate`] = d
                 }
                 for(let i in tmp) {
                     time[`${i}Time`] = tmp[i].length
+                    total += tmp[i].length
                 }
                 p = Object.assign(p, time)
+                p["totalTime"] = total
                 return p
             },
+            //平均血糖，平均血氧浓度
             $_average(data) {
                 let sum = 0
                 data.map((i) => { sum += i })
@@ -142,11 +156,11 @@
                         this.chartData[0].data = bloodArray.call(this, 3)
                         this.chartData[1].data = bloodArray.call(this, 7)
                         this.chartData[2].data = bloodArray.call(this, 30)
-                        this.$store.state.sugarData = res.data.data
-                        console.log(this.$store.state.sugarData)
                         for(let i = 0; i < this.chartData.length; i++) {
                             this.makeChart(i)
+                            this.pieChart(i)
                         }
+                        
                     })
                     .catch((error) => {  
                         console.log(error)
@@ -175,6 +189,7 @@
                             backgroundColor: "rgba(0, 0, 0, 0)",
                             pointBackgroundColor: "#aaa",
                             pointStyle: "circle",
+                            pointRadius: 0,
                             borderColor: "#aaa",
                             borderWidth: 1,
                             data: this.chartData[i].data,
@@ -215,10 +230,10 @@
                         }]
                     },
                     legend: {
-                        onClick(e, item) {
-                            console.log(item);
-                            
-                        }
+                        display: false,
+                        // onClick(e, item) {
+                        //     console.log(item);
+                        // }
                     }
                 }
                 var myChart = new Chart(ctx, {
@@ -226,11 +241,35 @@
                     data: data,
                     options: options
                 });
-            
             },
+            pieChart(i) {
+                var ctx = document.getElementsByClassName("pieChart")[i]
+                var obj = this.chartData[i].classify
+                var data = {
+                    datasets: [
+                        {
+                            backgroundColor: ["#E6A23C", "#F56C6C", "#67C23A"],
+                            data: new Array(obj.lowTime, obj.highTime, obj.mediumTime)
+                        }
+                    ]
+                }
+                var options = {
+                    legend: {
+                        display: false,
+                    }
+                }
+                var myPieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: data,
+                    options: options
+                });
+            }
         },
         mounted() {
             this.$_getData()
+            for(let i = 0; i < 3; i++){
+                this.pieChart(i)
+            }
         }
     }
 </script>
@@ -248,31 +287,44 @@
                 border-bottom: 1px solid #eee;
             }
             .chart-container {
-                padding: 10px;
+                padding: 10px 0;
                 .chart-form {
-                    width: calc(100% - 20px);
+                    width: 100%;
                     height: 240px;
-                    margin: 10px;
-                    border: 1px solid #000;
-                    border-radius: 8px;
+                    border-top: 1px solid rgb(160, 207, 255);
+                    // border-radius: 8px;
                     .header {
                         width: 100%;
                         height: 60px;
-                        border-bottom: 1px solid #000;
+                        border-bottom: 1px solid rgb(160, 207, 255);
                         display: flex;
                         .item {
                             width: 50%;
                             padding: 0 10px;
                             display: flex;
-                            justify-content: center;
+                            // justify-content: center;
                             align-items: center;
+                            position: relative;
+                            .left {
+                                margin-left: 14px;
+                            }
+                            .right {
+                                position: absolute;
+                                right: 14px;
+                                .float {
+                                    font-size: 12px;
+                                }
+                                .word {
+                                    font-size: 24px;
+                                    margin: 0 4px;
+                                }
+                            }
                             &:first-child {
-                                border-right: 1px solid #000;
+                                border-right: 1px solid rgb(160, 207, 255);
+                                display: flex;
+                                
                             }
-                            .word {
-                                font-size: 24px;
-                                margin: 0 10px;
-                            }
+                            
                         }
                         // p {
                         //     margin: auto;
@@ -281,16 +333,28 @@
                         // }
                     }
                     .context {
-                        padding: 10px 10%;
-                        text-align: left;
-                        .item {
-                            display: block;
-                            margin: 10px;
-                            .el-tag {
-                                font-size: 16px;
+                        // padding: 10px 10%;
+                        // text-align: left;
+                        height: calc(100% - 60px);
+                        display: flex;
+                        align-items: center;
+                        .left {
+                            width: 50%;
+                            .item {
+                                display: block;
+                                margin: 10px;
+                                .el-tag {
+                                    font-size: 16px;
+                                }
+                                span {
+    
+                                }
                             }
-                            span {
-
+                        }
+                        .right {
+                            margin: auto;
+                            .text {
+                                margin-top: 5px;
                             }
                         }
                     }
