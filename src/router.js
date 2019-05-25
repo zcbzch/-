@@ -36,11 +36,6 @@ export default new Router({
                             name: 'blood-pressure',
                             component: () => import('@/views/detail/blood-pressure.vue'),
                         },
-                        {
-                            path: 'heart-rate',
-                            name: 'heart-rate',
-                            component: () => import('@/views/detail/heart-rate.vue'),
-                        },
                         
                     ]
                 },

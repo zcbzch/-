@@ -1,12 +1,29 @@
 <template>
-    <div id="blood-sugar">
+    <div id="blood-sugar" v-loading.fullscreen.lock="loading">
         <div class="chart"
             v-for="(item, index) in chartData" 
             :key="index">
             <div class="chart-title">{{ item.label }}</div>
             <div class="chart-container">
-                <canvas class="myChart" height="80%" width="80%"></canvas>
                 <div class="chart-form">
+
+                    <div class="header">
+                        <div class="item">
+                            <div class="left">上限值</div>
+                            <div class="right">
+                                <span class="word">{{ getMaxData(index) }}</span>
+                                <div class="float">mmol/L</div>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="left">下限值</div>
+                            <div class="right">
+                                <span class="word">{{ getMinData(index) }}</span>
+                                <div class="float">mmol/L</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="header">
                         <div class="item">
                             <div class="left">平均值</div>
@@ -23,6 +40,8 @@
                             </div>
                         </div>
                     </div>
+
+                    
                     <div class="context">
                         <div class="left">
                             <div class="item">
@@ -41,9 +60,10 @@
                         </div>
                     </div>
                 </div>
+                <canvas class="myChart" height="80%" width="80%"></canvas>
             </div>
         </div>
-
+        <mt-button type="primary" size="large" @click="() => {this.$router.push({name: 'blood-sugar-data'})}">查看详细数据</mt-button>
     </div>
 </template>
 
@@ -56,6 +76,7 @@
                 chartData: [
                     {
                         label: '最近三天',
+                        // day: 3,
                         data: [],
                         average: {
                             average: null,
@@ -73,12 +94,14 @@
                     },
                     {
                         label: '最近七天',
+                        // day: 7,
                         data: [],
                         average: {},
                         classify: {}
                     },
                     {
                         label: '最近一月',
+                        // day: 30,
                         data: [],
                         average: {},
                         classify: {}
@@ -86,6 +109,7 @@
                 ],
                 data: [],
                 pickerVisible: '',
+                loading: false,
             }
         },
         computed: {
@@ -102,6 +126,14 @@
             }
         },
         methods: {
+            getMaxData(day) {
+                let max = Math.max.apply(null, this.chartData[day].data) 
+                return parseFloat(max.toFixed(1)) 
+            },
+            getMinData(day) {
+                let min = Math.min.apply(null, this.chartData[day].data)
+                return parseFloat(min.toFixed(1)) 
+            },
             //正常，过高，过低的次数及百分比
             $_classify(data) {
                 let tmp = {
@@ -120,8 +152,8 @@
                 })
                 let p = {}, time = {}, total = 0
                 for(let i in tmp) {
-                    let d = (tmp[i].length / data.length).toFixed(4) * 100
-                    d == 0 ? p[`${i}Rate`] = `00.00` : p[`${i}Rate`] = d
+                    let d = Math.round((tmp[i].length / data.length) * 100) 
+                    d == 0 ? p[`${i}Rate`] = `00` : p[`${i}Rate`] = d
                 }
                 for(let i in tmp) {
                     time[`${i}Time`] = tmp[i].length
@@ -133,9 +165,11 @@
             },
             //平均血糖，平均血氧浓度
             $_average(data) {
+                // console.log('data:'+data)
                 let sum = 0
                 data.map((i) => { sum += i })
                 let p = parseFloat((sum / data.length).toFixed(2))
+                // console.log('p:'+p)
                 let tmp = {
                     average: p.toFixed(2),
                     imitate: ((p + 4.29) / 1.98).toFixed(2)
@@ -147,24 +181,31 @@
                 else return 'green'
             },
             $_getData: async function() {
-                let params = {
-                    username: sessionStorage.getItem('username')
-                }
-                this.axios.get('/detail/blood-sugar', { params: params })
+                this.loading = true
+                await this.axios.get('/detail/blood-sugar')
                     .then((res) => {
                         this.data = res.data.data
                         this.chartData[0].data = bloodArray.call(this, 3)
+                        // console.log(this.chartData[0])
                         this.chartData[1].data = bloodArray.call(this, 7)
                         this.chartData[2].data = bloodArray.call(this, 30)
+
+                        for(let item of this.chartData) {
+                            item.average = this.$_average(item.data)
+                            item.classify = this.$_classify(item.data)
+                        }
+
                         for(let i = 0; i < this.chartData.length; i++) {
                             this.makeChart(i)
                             this.pieChart(i)
                         }
+                        this.loading = false
                         
                     })
                     .catch((error) => {  
                         console.log(error)
                 })
+
                 function bloodArray(day) {
                     let arr = []
                     for(let i = 0; i < day; i++) {
@@ -172,11 +213,6 @@
                     }
                     arr = arr.map((i) => { return i = i - 0 })
                     return arr
-                }
-                
-                for(let item of this.chartData) {
-                    item.average = this.$_average(item.data)
-                    item.classify = this.$_classify(item.data)
                 }
             },
             makeChart(i) {
@@ -277,26 +313,26 @@
 <style lang="less">
     #blood-sugar {
         width: 100%;
+        padding: 0 10px 20px 10px;
         .chart {
-            margin: 10px;
+            margin: 20px 0px;
             background-color: #fff;
             border-radius: 8px;
             .chart-title {
                 height: 40px;
                 line-height: 40px;
-                border-bottom: 1px solid #eee;
             }
             .chart-container {
                 padding: 10px 0;
                 .chart-form {
                     width: 100%;
-                    height: 240px;
-                    border-top: 1px solid rgb(160, 207, 255);
+                    height: 300px;
+                    border-top: 1px solid #606266;
                     // border-radius: 8px;
                     .header {
                         width: 100%;
                         height: 60px;
-                        border-bottom: 1px solid rgb(160, 207, 255);
+                        border-bottom: 1px solid #606266;
                         display: flex;
                         .item {
                             width: 50%;
@@ -320,7 +356,7 @@
                                 }
                             }
                             &:first-child {
-                                border-right: 1px solid rgb(160, 207, 255);
+                                border-right: 1px solid #606266;
                                 display: flex;
                                 
                             }
@@ -335,14 +371,15 @@
                     .context {
                         // padding: 10px 10%;
                         // text-align: left;
-                        height: calc(100% - 60px);
+                        height: calc(100% - 120px);
                         display: flex;
                         align-items: center;
                         .left {
                             width: 50%;
                             .item {
                                 display: block;
-                                margin: 10px;
+                                margin: 10px 30px;
+                                text-align: left;
                                 .el-tag {
                                     font-size: 16px;
                                 }
@@ -367,7 +404,7 @@
                 height: 30px;
                 line-height: 30px;
                 font-size: 14px;
-                background-color: #eee;
+                background-color: #606266;
                 margin-top: 20px;
             }
         }

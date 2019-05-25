@@ -25,10 +25,10 @@
                         name: 'blood-pressure',
                         label: '血压',
                     },
-                    {
-                        name: 'heart-rate',
-                        label: '心率',
-                    },
+                    // {
+                    //     name: 'heart-rate',
+                    //     label: '心率',
+                    // },
                 ]
             }
         },
@@ -44,6 +44,15 @@
 <style lang='less'>
     #detail {
         width: 100%;
+        .mint-navbar {
+            // background-color: rgba(64, 158, 255);
+            color: #C0C4CC;
+            letter-spacing: 6px;
+            .mint-tab-item-label {
+                font-size: 16px
+            }
+        }
+
         .line {
             width: 100%;
             height: 1px;

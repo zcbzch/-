@@ -18,9 +18,19 @@
         </div>
        
         <div class="user-operation">
-            <div class="item"><div class="item-inside" @click="() => { this.$router.push({name: 'blood-sugar-data'}) }">血糖详细数据</div></div>
-            <div class="item"><div class="item-inside" @click="() => { this.$router.push({name: 'blood-pressure-data'}) }">血压详细数据</div></div>
-            <div class="item"><div class="item-inside">血糖数据</div></div>
+            <div class="item" 
+                @click="() => {
+                    this.$router.push({name: 'blood-sugar-data'}) 
+                    }">
+                血糖详细数据
+            </div>
+            <div class="item" 
+                @click="() => {
+                    this.$router.push({name: 'blood-pressure-data'}) 
+                    }">
+                血压详细数据
+            </div>
+            <!-- <div class="item"><div class="item-inside">血糖数据</div></div> -->
         </div>
 
         <!-- <router-view></router-view> -->
@@ -52,11 +62,15 @@
                 // console.log(params)
                 this.axios.get('/users/information', { params: params })
                     .then(res => {
+                        console.log(res)
                         res = res.data
                         if(res.code = 200000) {
                             this.userData = res.data
-                            console.log(this.userData)
+                            // console.log(this.userData)
                         }
+                    })
+                    .catch((error) => {
+                        console.log(error)
                     })
             },
             $_routeToLogin() {
@@ -118,24 +132,23 @@
         }
 
         .user-operation {
-            display: flex;
+            // display: flex;
             flex-wrap: wrap;
             padding: 10px;
             .item {
-                width: 50%;
+                width: 100%;
                 height: 20vh;
                 padding: 8px;
-                
-                .item-inside {
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 8px;
-                    background-color: rgb(255, 34, 34);
-                    color: #fff;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
+                margin: 10px 0;
+                border-radius: 8px;
+                background-color: #409EFF;
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 18px;
+                font-weight: 500;
+                letter-spacing: 2px;
             }
         }
     }

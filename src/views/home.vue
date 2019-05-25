@@ -1,6 +1,6 @@
 <template>
     <div id="home">
-       <div class="test-header">
+       <div class="test-header" v-loading.fullscreen.lock="loading">
            <p class="header">危机指数</p>
            <el-progress 
                 type="circle" 
@@ -77,7 +77,8 @@
                         number: 0,
                         tweenedNumber: 0,
                     },
-                }
+                },
+                loading: false,
             }
         },
         created: function () {
@@ -116,11 +117,13 @@
                 }
             },
             $_getRiskNum() {
+                this.loading = true
                 this.axios.get('/index/mutiple')
                     .then((res => {
                         let data = res.data.data
-                        console.log(data)
+                        // console.log(data)
                         this.riskNumSet.bloodSugar.number = data.riskNum
+                        this.loading = false
                     }))
                 // let params = {
                 //     username: sessionStorage.getItem('username')

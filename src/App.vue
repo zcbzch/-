@@ -23,7 +23,7 @@
     padding: 0;
     overflow: hidden;
     height: 100%;
-    background-color: #eee;
+    background-color: rgba(242, 246, 252, .5);
   }
   * {
     box-sizing: border-box;
