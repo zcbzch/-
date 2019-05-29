@@ -1,12 +1,12 @@
 <template>
     <div id="home">
-       <div class="test-header" v-loading.fullscreen.lock="loading">
+        <div class="test-header" v-loading.fullscreen.lock="loading">
            <p class="header">危机指数</p>
            <el-progress 
                 type="circle" 
                 :width='200' 
                 :stroke-width='10' 
-                :color="healthStatus(riskNumSet.mutiple.number).color" 
+                :color="riskNumSet.mutiple.color" 
                 :percentage="riskNum"
                 status="text">
                 <div class="circle-text">
@@ -17,14 +17,29 @@
                     </div>
                 </div>
             </el-progress>
-       </div>
-       <div class="test-container">
+        </div>
+
+        <div class="swipe">
+            <mt-swipe :auto="3000">
+                <mt-swipe-item>
+                    <img style="width:100%; height:100%" src="../assets/swipe1.png"/>
+                </mt-swipe-item>
+                <mt-swipe-item>
+                    <img style="width:100%; height:100%" src="../assets/swipe2.png"/>
+                </mt-swipe-item>
+                <mt-swipe-item>
+                    <img style="width:100%; height:100%" src="../assets/swipe3.png"/>
+                </mt-swipe-item>
+            </mt-swipe>
+        </div>
+
+        <div class="test-container">
            <div class="test-item">
                <el-progress 
                     type="circle" 
                     :width='60' 
                     :stroke-width='6' 
-                    :color="healthStatus(riskNumSet.bloodSugar.number).color" 
+                    :color="riskNumSet.bloodSugar.color" 
                     :percentage="riskNum_sugar"
                     status="text">
                     <p style="font-size: 20px">
@@ -33,15 +48,15 @@
                 </el-progress>
                 <div class="item-text">
                     <div class="header">血糖危机指数</div>
-                    <div class="footer">7777777777777777777777777777777777777</div>
+                    <div class="footer">777777777777777777777777777</div>
                 </div>
-           </div>
-           <div class="test-item">
+            </div>
+            <div class="test-item">
                <el-progress 
                     type="circle" 
                     :width='60' 
                     :stroke-width='6' 
-                    :color="healthStatus(riskNumSet.bloodPressure.number).color" 
+                    :color="riskNumSet.bloodPressure.color" 
                     :percentage="riskNum_pressure"
                     status="text">
                     <p style="font-size: 20px">
@@ -51,10 +66,10 @@
                 <div class="item-text">
                     <div class="header">血压危机指数</div>
                     <!-- <div class="line"></div> -->
-                    <div class="footer">7777777777777777777777777777777777777</div>
+                    <div class="footer">77777777777777777777777777777</div>
                 </div>
-           </div>
-       </div>
+            </div>
+        </div>
        
     </div>
 </template>
@@ -68,16 +83,22 @@
                     mutiple: {
                         number: 0,
                         tweenedNumber: 0,
+                        color: '#67c23a'
                     },
                     bloodSugar: {
                         number: 0,
                         tweenedNumber: 0,
+                        color: '#67c23a'
                     },
                     bloodPressure: {
                         number: 0,
                         tweenedNumber: 0,
+                        color: '#67c23a'
                     },
                 },
+                chartData: [],
+                highData: [],
+                lowData: [],
                 loading: false,
             }
         },
@@ -116,73 +137,438 @@
                     case x >= 70: return {color: 'red', tip: '身体危险，请就医'}
                 }
             },
-            $_getRiskNum() {
-                this.loading = true
-                this.axios.get('/index/mutiple')
-                    .then((res => {
+            $_getRiskNum: async function() {
+                // this.loading = true
+                await this.axios.get('/detail/blood-sugar/week')
+                    .then((res) => {
                         let data = res.data.data
-                        // console.log(data)
-                        this.riskNumSet.bloodSugar.number = data.riskNum
+                        let arrData = []
+                        let arrColor = []
+                        let obj = {}
+                        for(let item in data) {
+                            let arr = data[item]
+                            let result = 0
+                            for(let i of arr) {
+                                result += getStatus(i).sugar
+                            }
+                            result /= arr.length
+                            obj[item] = result
+                        }
+                        arrData = [obj.beforeDawn, obj.morning, obj.noon, obj.dusk]
+                        this.chartData = arrData
+
+                        if(this.chartData.length) {
+                            let m = 0
+                            for(let item of this.chartData) {
+                                m += item
+                            }
+                            m /= this.chartData.length
+    
+                            this.riskNumSet.mutiple.number = caculateRiskNum(m)
+                            this.riskNumSet.mutiple.color = getColor(m)
+    
+                            this.riskNumSet.bloodSugar.number = caculateRiskNum(m)
+                            this.riskNumSet.bloodSugar.color = getColor(m)
+                        }
+                        
+                        this.$_getPressureRisk()
                         this.loading = false
-                    }))
-                // let params = {
-                //     username: sessionStorage.getItem('username')
-                // }
-                // this.axios.get('/detail/blood-sugar', { params: params })
-                // .then((res) => {
-                //     let data = res.data.data
-                //     let a = handleData(data)
-                //     let b = caculateRiskNum(a)
-                //     console.log(b)
-                //     this.riskNumSet.bloodSugar.number = b
-                //     // console.log('test')
-                // })
-                // .catch((error) => {
-                //     console.log(error)
-                // })
-                //早中晚平均数,凌晨平均数
-                // function handleData(array) {
-                // let average = {
-                //     emptyStomach: 0,
-                //     beforeDawn: 0,
-                // }
-                // // console.log(average)
-                // for(let i of array) {
-                //     average.beforeDawn += parseFloat(i.data[0])
-                //     average.emptyStomach += parseFloat(i.data[1]) + parseFloat(i.data[2]) + parseFloat(i.data[3])
-                // }
-                // average.beforeDawn = Math.round((average.beforeDawn / 30) * 100) / 100
-                // average.emptyStomach = Math.round((average.emptyStomach / 90) * 100) / 100
-                // console.log(average)
-                
-                // return average
-                // }
-                // //危险度计算
-                // function caculateRiskNum(object) {
-                // let m = object.emptyStomach
-                // if(m > 6.1 && m <= 8.4) {
-                //     m = (m - 5) / 1.7 + 1
-                //     m = Math.pow(m, -2)
-                //     m = 1 / m
-                // } else if(m > 3.9 && m <= 6.1) {
-                //     m = Math.pow(m - 5, 4)
-                // } else if(m <= 3.9) {
-                //     m = (5 - m) / 1.7 + 1
-                //     m = Math.pow(m, -2)
-                //     m = 1 / m
-                // }
-                // return Math.round(m * 100)
-                // }
-                // for(let item in this.riskNumSet) {
-                //     this.riskNumSet[item].number = this.$store.state.riskNum[item]
-                // }
+                        
+                    })
+                    .catch((error) => {  
+                        if(error.response.status = 401) {
+                            MessageBox('提示', '登录过期，请重新登录')
+                            .then(action => {
+                                this.$router.push({name: 'login'})
+                            })
+                        }
+                    })
+                //危险度计算
+                function caculateRiskNum(m) {
+                    if(m > 6.1 && m <= 8.4) {
+                        m = (m - 5) / 1.7
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                    } else if(m > 3.9 && m <= 6.1) {
+                        m = Math.pow(m - 5, 4)
+                        m = 0.2 * m
+                    } else if(m <= 3.9) {
+                        m = (5 - m) / 1.7
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                    }
+                    // console.log(m)
+                    return Math.round(m * 100)
+                }
+                //解密
+                function getStatus(str) {
+                    //最后一位忽略
+                    if(!str) return { sugar: 0, color: '#000' }
+                    const one = str.slice(0,1)
+                    const two = str.slice(1,2)
+                    const three = str.slice(2,3)
+                    const four = str.slice(3,4)
+                    // const five = str.slice(4,5)
+                    //高血压区域
+                    if(two == 'h') {
+                        if(three == 'h') {
+                            switch(four){
+                                case 'm': return { sugar: 7.0, color: '#e6a23c' }
+                                case 'a': return { sugar: 6.8, color: '#e6a23c' }
+                                case 'b': return { sugar: 6.5, color: '#e6a23c' }
+                                case 'c': return { sugar: 6.3, color: '#e6a23c' }
+                            }
+                        } else if(three == 'l') {
+                            switch(four){
+                                case 'm': return { sugar: 8.4, color: '#f56c6c' }
+                                case 'a': return { sugar: 8.1, color: '#f56c6c' }
+                                case 'b': return { sugar: 7.7, color: '#f56c6c' }
+                                case 'c': return { sugar: 7.3, color: '#f56c6c' }
+                            }
+                        } else if(three == 'm') {
+                            switch(four){
+                                case 'm': return { sugar: 11.1, color: '#ff0000' }
+                                case 'a': return { sugar: 10.5, color: '#ff0000' }
+                                case 'b': return { sugar: 9.8, color: '#ff0000' }
+                                case 'c': return { sugar: 9.1, color: '#ff0000' }
+                            }
+                        } else if(three == 's') {
+                            return { sugar: 13.0, color: '#A52A2A' }
+                        } 
+                    } 
+                    //正常区域
+                    else if(two == 'n') {
+                        if(three == 'l') {
+                            switch(four){
+                                case 'm': return { sugar: 3.9, color: '#6666ff' }
+                                case 'a': return { sugar: 3.7, color: '#6666ff' }
+                                case 'b': return { sugar: 3.4, color: '#6666ff' }
+                                case 'c': return { sugar: 3.1, color: '#6666ff' }
+                            }
+                        } else if(three == 'n') {
+                            switch(four){
+                                case 'm': return { sugar: 5.5, color: '#67c23a' }
+                                case 'a': return { sugar: 5.3, color: '#67c23a' }
+                                case 'b': return { sugar: 4.7, color: '#67c23a' }
+                                case 'c': return { sugar: 4.1, color: '#67c23a' }
+                            }
+                        } else if(three == 'h') {
+                            switch(four){
+                                case 'm': return { sugar: 6.0, color: '#ffff37' }
+                                case 'a': return { sugar: 5.9, color: '#ffff37' }
+                                case 'b': return { sugar: 5.8, color: '#ffff37' }
+                                case 'c': return { sugar: 5.7, color: '#ffff37' }
+                            }
+                        }
+                    }
+                    //低压区域
+                    else if(two == 'l') {
+                        return { sugar: 2.4, color: '#663399' }
+                    }
+                }
+                function getColor(num) {
+                    if(num <= 2.9) {
+                        return '#663399'
+                    } else if(num <= 3.9 && num > 2.9) {
+                        return '#6666ff'
+                    } else if(num <= 5.5 && num > 3.9) {
+                        return '#67c23a'
+                    } else if(num <= 6.0 && num > 5.5) {
+                        return '#ffff37'
+                    } else if(num <= 7.0 && num > 6.0) {
+                        return '#e6a23c'
+                    } else if(num <= 8.4 && num > 7.0) {
+                        return '#f56c6c'
+                    } else if(num <= 11.1 && num > 8.4) {
+                        return '#ff0000'
+                    } else if(num > 11.1) {
+                        return '#A52A2A'
+                    }
+                }
             },
+            $_getPressureRisk: async function() {
+                await this.axios.get('/detail/blood-pressure/week')
+                    .then((res) => {
+                        let data = res.data.data
+                        let highData = []
+                        let lowData = []
+                        let highColor = []
+                        let lowColor = []
+
+                        let highObj = {}
+                        let lowObj = {}
+                        for(let item in data) {
+                            let arr = data[item]
+                            let resultHigh = 0
+                            let resultLow = 0
+                            for(let i of arr) {
+                                resultHigh += getStatusHigh(i.pressureHigh).pressure
+                                resultLow += getStatusLow(i.pressureLow).pressure
+                            }
+                            if(arr.length) {
+                                resultHigh /= arr.length
+                                resultLow /= arr.length
+                            }
+                            if(resultHigh > 0) {
+                                highObj[item] = resultHigh
+                                highData.push(resultHigh)
+                            }
+                            if(resultLow > 0) {
+                                lowObj[item] = resultLow
+                                lowData.push(resultLow)
+                            }
+                        }
+                        // highData = [highObj.beforeSleep, highObj.morning, highObj.noon, highObj.dusk]
+                        // lowData = [lowObj.beforeSleep, lowObj.morning, lowObj.noon, lowObj.dusk]
+                        // for(let i; i < highData.length; i++) {
+                        //     if(highData[i]) 
+                        //     // highColor.push(getColorHigh(i))
+                        // }
+                        // for(let i; i < lowData.length; i++) {
+                        //     if(highData[i]) 
+                        //     // lowColor.push(getColorLow(i))
+                        // }
+                        
+                        this.highData = highData
+                        this.lowData = lowData
+
+                        // console.log(this.highData)
+                        if(this.highData.length || this.lowData.length) {
+                            let m = 0
+                            let n = 0
+                            let riskNum = 0
+                            let color = ''
+                            // console.log(n)
+                            for(let item of this.highData) {
+                                m += item
+                            }
+                            m /= this.highData.length
+
+                            for(let item of this.lowData) {
+                                n += item
+                            }
+                            n /= this.lowData.length
+                
+                            console.log(m)
+                            console.log(n)
+                            let high = caculateRiskNumHigh(m)
+                            let low = caculateRiskNumLow(n)
+                            console.log(high)
+                            console.log(low)
+                            if(high > low) {
+                                riskNum = high
+                                color = getColorHigh(high)
+                            } else {
+                                riskNum = low
+                                color = getColorLow(low)
+                            }
+
+                            this.riskNumSet.bloodPressure.number = riskNum
+                            this.riskNumSet.bloodPressure.color = color
+                            console.log(riskNum)
+                        }
+                        
+                    })
+                    .catch((error) => { 
+                        console.log(error)
+                        if(error.response.status = 401) {
+                            MessageBox('提示', '登录过期，请重新登录')
+                            .then(action => {
+                                this.$router.push({name: 'login'})
+                            })
+                        }
+                    })
+                //危险度计算
+                function caculateRiskNumHigh(m) {
+                    
+                    if(m >= 140) {
+                        m = (m - 120) / 20
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                    
+                    } else if(m >= 90 && m < 110) {
+                        m = Math.pow(110 - m, 3)
+                        let n = Math.pow(10, -5)
+                        m = 6.25 * n * m
+                    } else if(m >= 110 && m < 140) {
+                        m = Math.pow(m - 110, 4)
+                        let n = Math.pow(10, -7)
+                        m = 6.17 * n * m
+                    } else if(m < 90) {
+                        m = (100 - m) / 10
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                    }
+                    console.log(m)
+                    return Math.round(m * 100)
+                }
+                function caculateRiskNumLow(m) {
+                    if(m >= 90) {
+                        m = (m - 80) / 10
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                        // console.log(m)
+                    } else if(m >= 60 && m < 80) {
+                        m = Math.pow(m - 80, 3)
+                        let n = Math.pow(10, -5)
+                        m = 6.25 * n * m
+                    } else if(m >= 80 && m < 90) {
+                        m = Math.pow(m - 80, 3)
+                        let n = Math.pow(10, -4)
+                        m = 5 * n * m
+                    } else if(m < 60) {
+                        m = (70 - m) / 10
+                        m = Math.pow(m, -2) + 1
+                        m = 1 / m
+                    }
+                    console.log(m)
+                    return Math.round(m * 100)
+                }
+
+                //解密 -- 高
+                function getStatusHigh(str) {
+                    //最后一位忽略
+                    if(!str) return { pressure: 0, color: '#000' }
+                    const one = str.slice(0,1)
+                    const two = str.slice(1,2)
+                    const three = str.slice(2,3)
+                    const four = str.slice(3,4)
+                    // const five = str.slice(4,5)
+                    //高血压区域
+                    if(two == 'h') {
+                        if(three == 'l') {
+                            switch(four){
+                                case 'm': return { pressure: 160, color: '#e6a23c' }
+                                case 'a': return { pressure: 155, color: '#e6a23c' }
+                                case 'b': return { pressure: 150, color: '#e6a23c' }
+                                case 'c': return { pressure: 145, color: '#e6a23c' }
+                            }
+                        } else if(three == 'm') {
+                            switch(four){
+                                case 'm': return { pressure: 180, color: '#f56c6c' }
+                                case 'a': return { pressure: 175, color: '#f56c6c' }
+                                case 'b': return { pressure: 170, color: '#f56c6c' }
+                                case 'c': return { pressure: 165, color: '#f56c6c' }
+                            }
+                        } else if(three == 's') {
+                            return { pressure: 190, color: '#ff0000' }
+                        } 
+                    } 
+                    //正常区域
+                    else if(two == 'n') {
+                        if(three == 'n') {
+                            switch(four){
+                                case 'm': return { pressure: 120, color: '#67c23a' }
+                                case 'a': return { pressure: 112, color: '#67c23a' }
+                                case 'b': return { pressure: 105, color: '#67c23a' }
+                                case 'c': return { pressure: 97, color: '#67c23a' }
+                            }
+                        } else if(three == 'h') {
+                            switch(four){
+                                case 'm': return { pressure: 140, color: '#ffff37' }
+                                case 'a': return { pressure: 135, color: '#ffff37' }
+                                case 'b': return { pressure: 130, color: '#ffff37' }
+                                case 'c': return { pressure: 125, color: '#ffff37' }
+                            }
+                        }
+                    }
+                    //低压区域
+                    else if(two == 'l') {
+                        return { pressure: 80, color: '#ff1493' }
+                    }
+                }
+                //解密 -- 低
+                function getStatusLow(str) {
+                    //最后一位忽略
+                    if(!str) return { pressure: 0, color: '#000' }
+                    const one = str.slice(0,1)
+                    const two = str.slice(1,2)
+                    const three = str.slice(2,3)
+                    const four = str.slice(3,4)
+                    // const five = str.slice(4,5)
+                    //高血压区域
+                    if(two == 'h') {
+                        if(three == 'l') {
+                            switch(four){
+                                case 'm': return { pressure: 100, color: '#e6a23c' }
+                                case 'a': return { pressure: 97, color: '#e6a23c' }
+                                case 'b': return { pressure: 95, color: '#e6a23c' }
+                                case 'c': return { pressure: 92, color: '#e6a23c' }
+                            }
+                        } else if(three == 'm') {
+                            switch(four){
+                                case 'm': return { pressure: 110, color: '#f56c6c' }
+                                case 'a': return { pressure: 107, color: '#f56c6c' }
+                                case 'b': return { pressure: 105, color: '#f56c6c' }
+                                case 'c': return { pressure: 102, color: '#f56c6c' }
+                            }
+                        } else if(three == 's') {
+                            return { pressure: 115, color: '#ff0000' }
+                        } 
+                    } 
+                    //正常区域
+                    else if(two == 'n') {
+                        if(three == 'n') {
+                            switch(four){
+                                case 'm': return { pressure: 80, color: '#67c23a' }
+                                case 'a': return { pressure: 75, color: '#67c23a' }
+                                case 'b': return { pressure: 70, color: '#67c23a' }
+                                case 'c': return { pressure: 65, color: '#67c23a' }
+                            }
+                        } else if(three == 'h') {
+                            switch(four){
+                                case 'm': return { pressure: 90, color: '#ffff37' }
+                                case 'a': return { pressure: 87, color: '#ffff37' }
+                                case 'b': return { pressure: 85, color: '#ffff37' }
+                                case 'c': return { pressure: 82, color: '#ffff37' }
+                            }
+                        }
+                    }
+                    //低压区域
+                    else if(two == 'l') {
+                        return { pressure: 80, color: '#ff1493' }
+                    }
+                }
+                //颜色 -- 高
+                function getColorHigh(num) {
+                    if(num <= 90) {
+                        return '#ff1493'
+                    } else if(num <= 120 && num > 90) {
+                        return '#67c23a'
+                    } else if(num <= 140 && num > 120) {
+                        return '#ffff37'
+                    } else if(num <= 160 && num > 140) {
+                        return '#e6a23c'
+                    } else if(num <= 180 && num > 160) {
+                        return '#f56c6c'
+                    } else if(num > 180) {
+                        return '#ff0000'
+                    }
+                }
+
+                //颜色 -- 低
+                function getColorLow(num) {
+                    if(num <= 60) {
+                        return '#ff1493'
+                    } else if(num <= 80 && num > 60) {
+                        return '#67c23a'
+                    } else if(num <= 90 && num > 80) {
+                        return '#ffff37'
+                    } else if(num <= 100 && num > 90) {
+                        return '#e6a23c'
+                    } else if(num <= 110 && num > 100) {
+                        return '#f56c6c'
+                    } else if(num > 110) {
+                        return '#ff0000'
+                    }
+                }
+            }
         },
         mounted() {
-            this.$_getRiskNum()
-            for(let item in this.riskNumSet) {
-                this.riskNumSet[item].number = this.$store.state.riskNum[item]
-            }
+            // this.$_getRiskNum()
+            // for(let item in this.riskNumSet) {
+            //     this.riskNumSet[item].number = this.$store.state.riskNum[item]
+            // }
         }
     }
 </script>
@@ -195,7 +581,7 @@
             display: flex;
             align-items: center;
             flex-direction: column;
-            height: 400px;
+            height: 350px;
             background: linear-gradient(rgb(118, 218, 243),rgb(97, 236, 160));
             .header {
                 font-weight: 600;
@@ -221,15 +607,25 @@
                 }
             }
         }
+
+        .swipe {
+            margin: 10px 0;
+            width: 100%;
+            height: 31%;
+            // background-color: red;
+        }
+
         .test-container {
-            padding: 10px 0;
-            background-color: #eee;
+            margin: 10px 0;
+            // background-color: #eee;
             .test-item {
                 height: 120px;
                 display: flex;
                 align-items: center;
                 padding: 0 40px;
-                background-color: #fff;
+                background-color:#fff;
+                border-top: 1px solid #409EFF;
+                border-bottom: 1px solid #409EFF;
                 margin-top: 10px;
                 border-radius: 4px;
                 .item-text {
@@ -245,6 +641,9 @@
                     }
                     .footer {
                         word-wrap: break-word;
+                    }
+                    .el-progress {
+                        background-color: #fff;
                     }
                 }
                 &:first-child {

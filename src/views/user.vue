@@ -70,7 +70,12 @@
                         }
                     })
                     .catch((error) => {
-                        console.log(error)
+                        if(error.response.status = 401) {
+                            MessageBox('提示', '登录过期，请重新登录')
+                            .then(action => {
+                                this.$router.push({name: 'login'})
+                            })
+                        }
                     })
             },
             $_routeToLogin() {
@@ -137,7 +142,7 @@
             padding: 10px;
             .item {
                 width: 100%;
-                height: 20vh;
+                height: 12vh;
                 padding: 8px;
                 margin: 10px 0;
                 border-radius: 8px;

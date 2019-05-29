@@ -7,14 +7,11 @@ router.get('/mutiple', (req, res) => {
       console.log('权限问题')
     }
     var userData = req.user.name
-    // console.log(userData)
     sugar.getSugarData(userData, (data) => {
       if(data.length > 0) {
           let myData = common.stringToObj(data[0].u_data)
           let average = handleData(myData)
-          // console.log(average)
           let risk = caculateRiskNum(average)
-          // console.log(risk)
           result = common.success('成功', {riskNum:risk})
           res.send(result)
       } else {
@@ -41,8 +38,8 @@ router.get('/mutiple', (req, res) => {
       return average
     }
     //危险度计算
-    function caculateRiskNum(object) {
-      let m = object.emptyStomach
+    function caculateRiskNum(m) {
+      // let m = object.emptyStomach
       if(m > 6.1 && m <= 8.4) {
         m = (m - 5) / 1.7 + 1
         m = Math.pow(m, -2)
@@ -59,15 +56,15 @@ router.get('/mutiple', (req, res) => {
 })
 
 //血糖
-router.get('/blood-sugar', (req, res) => {
-  if(!req.headers.authorization == req.sessionID) {
-    result = common.error('登录过期，请重新登录')
-    res.send(result)
-  }
-  var m = 70
-  result = common.success('成功', m)
-  res.send(result)
-});
+// router.get('/blood-sugar', (req, res) => {
+//   if(!req.headers.authorization == req.sessionID) {
+//     result = common.error('登录过期，请重新登录')
+//     res.send(result)
+//   }
+//   var m = 70
+//   result = common.success('成功', m)
+//   res.send(result)
+// });
 
 //血压
 router.get('/blood-pressure', (req, res) => {
@@ -75,9 +72,19 @@ router.get('/blood-pressure', (req, res) => {
     result = common.error('登录过期，请重新登录')
     res.send(result)
   }
-  var m = 20
-  result = common.success('成功', m)
-  res.send(result)
+  var userData = req.user.name
+    pressure.getPressureData(userData, (data) => {
+      if(data.length > 0) {
+          let myData = common.stringToObj(data[0].u_data)
+          let average = handleData(myData)
+          let risk = caculateRiskNum(average)
+          result = common.success('成功', {riskNum:risk})
+          res.send(result)
+      } else {
+          result = common.error('失败')
+          res.send(result)
+      }
+    })
 });
 
 module.exports = router;

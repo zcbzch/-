@@ -32,18 +32,18 @@ router.get('/information', async (req, res) => {
   let userData = req.user.name
   let resultData = {}
   users.getUserInformation(userData, (data) => {
+    // console.log(data)
     if(data.length) {
-      // console.log(data)
       for(let i in data[0]) {
         resultData[i] = data[0][i]
       }
-      // console.log(resultData)
-      if(resultData.sex = 'male') {
+      if(resultData.sex == 'male') {
         resultData.sex = '男'
-      } else if(resultData.sex = 'female') {
+      } else if(resultData.sex == 'female') {
         resultData.sex = '女'
       }
       result = common.success('成功', resultData)
+      console.log(result)
       res.send(result)
     }
   })

@@ -12,6 +12,7 @@ import axios from 'axios'
 Vue.use(Mint)
 Vue.use(Element)
 Vue.config.productionTip = false
+
 Vue.prototype.axios = axios
 
 new Vue({

@@ -4,25 +4,15 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-// var mysql = require('mysql');
-// var session = require('express-session');
-// var SessionStore = require('express-mysql-session');
-// var settings = require('./data/settings.js');
-// var pool  = mysql.createPool(settings);
 
-// var FileStore = require('session-file-store')(session);
 var common = require('./lib/common.js')
 var indexRouter = require('./routes/index');
 var detailRouter = require('./routes/detail');
 var usersRouter = require('./routes/users');
 var expressJWT = require('express-jwt');
-// var session = require('../server/data/session.js')
 
 var app = express();
 
-// view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
 global.common = common;
 app.use(logger('dev'));
 app.use(express.json());
@@ -40,7 +30,11 @@ app.use(expressJWT({
       {
         url: '/users/login', 
         methods: ['POST']
-      }
+      },
+      // {
+      //   url: '/detail/blood-sugar', 
+      //   methods: ['GET']
+      // }
     ]
 }))
 
@@ -64,6 +58,7 @@ app.use('/index', indexRouter);
 app.use('/detail', detailRouter);
 app.use('/users', usersRouter);
 
+//处理json数据，UTF-8数据. row-Buffer流数据，text-文本数据
 app.all('*', function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -73,7 +68,7 @@ app.all('*', function(req, res, next) {
 })
 
 
-//处理json数据，UTF-8数据. row-Buffer流数据，text-文本数据
+
 // app.post('/users/test', (req, res) => {
 //   console.log(req.body)
 // })
