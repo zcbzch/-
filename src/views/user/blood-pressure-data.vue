@@ -1,5 +1,5 @@
 <template>
-    <div id="blood-pressure-data">
+    <div id="blood-pressure-data" v-loading.fullscreen.lock="loading">
         <div class="header">
             <div class="left" @click="() => {this.$router.back()}"><i class="el-icon-arrow-left"></i></div>
             {{ `血压记录` }}
@@ -7,7 +7,7 @@
 
         <div class="chart-title">
             <div class="item">
-                <div class="block-color" style="background-color:#ff1493"></div>
+                <div class="block-color" style="background-color:#663399"></div>
                 <p>低血压</p>
             </div>
             <div class="item">
@@ -37,7 +37,7 @@
                 <p>临界单期</p>
             </div>
             <div class="item">
-                <div class="block-color" style="background-color:#663399"></div>
+                <div class="block-color" style="background-color:#ff1493"></div>
                 <p>单纯收缩期</p>
             </div>
         </div>
@@ -66,7 +66,8 @@ export default {
     name: 'blood-pressure-data',
     data() {
         return {
-            chartData: {}
+            chartData: {},
+            loading: false,
         }
     },
     methods: {
@@ -112,6 +113,7 @@ export default {
             return result
         },
         $_getData: async function() {
+            this.loading = true
             this.axios.get('/detail/blood-pressure/list')
                 .then((res) => {
                     let data = res.data.data
@@ -132,144 +134,146 @@ export default {
                     }
                 })
 
-                //解密 -- 高
-                function getStatusHigh(str) {
-                    //最后一位忽略
-                    if(!str) return { pressure: 0, color: '#000' }
-                    const one = str.slice(0,1)
-                    const two = str.slice(1,2)
-                    const three = str.slice(2,3)
-                    const four = str.slice(3,4)
-                    // const five = str.slice(4,5)
-                    //高血压区域
-                    if(two == 'h') {
-                        if(three == 'l') {
-                            switch(four){
-                                case 'm': return { pressure: 160, color: '#e6a23c' }
-                                case 'a': return { pressure: 155, color: '#e6a23c' }
-                                case 'b': return { pressure: 150, color: '#e6a23c' }
-                                case 'c': return { pressure: 145, color: '#e6a23c' }
-                            }
-                        } else if(three == 'm') {
-                            switch(four){
-                                case 'm': return { pressure: 180, color: '#f56c6c' }
-                                case 'a': return { pressure: 175, color: '#f56c6c' }
-                                case 'b': return { pressure: 170, color: '#f56c6c' }
-                                case 'c': return { pressure: 165, color: '#f56c6c' }
-                            }
-                        } else if(three == 's') {
-                            return { pressure: 190, color: '#ff0000' }
-                        } 
+            //解密 -- 高
+            function getStatusHigh(str) {
+                //最后一位忽略
+                if(!str) return { pressure: 0, color: '#000' }
+                const one = str.slice(0,1)
+                const two = str.slice(1,2)
+                const three = str.slice(2,3)
+                const four = str.slice(3,4)
+                // const five = str.slice(4,5)
+                //高血压区域
+                if(two == 'h') {
+                    if(three == 'l') {
+                        switch(four){
+                            case 'm': return { pressure: 160, color: '#e6a23c' }
+                            case 'a': return { pressure: 155, color: '#e6a23c' }
+                            case 'b': return { pressure: 150, color: '#e6a23c' }
+                            case 'c': return { pressure: 145, color: '#e6a23c' }
+                        }
+                    } else if(three == 'm') {
+                        switch(four){
+                            case 'm': return { pressure: 180, color: '#f56c6c' }
+                            case 'a': return { pressure: 175, color: '#f56c6c' }
+                            case 'b': return { pressure: 170, color: '#f56c6c' }
+                            case 'c': return { pressure: 165, color: '#f56c6c' }
+                        }
+                    } else if(three == 's') {
+                        return { pressure: 190, color: '#ff0000' }
                     } 
-                    //正常区域
-                    else if(two == 'n') {
-                        if(three == 'n') {
-                            switch(four){
-                                case 'm': return { pressure: 120, color: '#67c23a' }
-                                case 'a': return { pressure: 112, color: '#67c23a' }
-                                case 'b': return { pressure: 105, color: '#67c23a' }
-                                case 'c': return { pressure: 97, color: '#67c23a' }
-                            }
-                        } else if(three == 'h') {
-                            switch(four){
-                                case 'm': return { pressure: 140, color: '#ffff37' }
-                                case 'a': return { pressure: 135, color: '#ffff37' }
-                                case 'b': return { pressure: 130, color: '#ffff37' }
-                                case 'c': return { pressure: 125, color: '#ffff37' }
-                            }
+                } 
+                //正常区域
+                else if(two == 'n') {
+                    if(three == 'n') {
+                        switch(four){
+                            case 'm': return { pressure: 120, color: '#67c23a' }
+                            case 'a': return { pressure: 112, color: '#67c23a' }
+                            case 'b': return { pressure: 105, color: '#67c23a' }
+                            case 'c': return { pressure: 97, color: '#67c23a' }
+                        }
+                    } else if(three == 'h') {
+                        switch(four){
+                            case 'm': return { pressure: 140, color: '#ffff37' }
+                            case 'a': return { pressure: 135, color: '#ffff37' }
+                            case 'b': return { pressure: 130, color: '#ffff37' }
+                            case 'c': return { pressure: 125, color: '#ffff37' }
                         }
                     }
-                    //低压区域
-                    else if(two == 'l') {
-                        return { pressure: 80, color: '#ff1493' }
-                    }
                 }
-                //解密 -- 低
-                function getStatusLow(str) {
-                    //最后一位忽略
-                    if(!str) return { pressure: 0, color: '#000' }
-                    const one = str.slice(0,1)
-                    const two = str.slice(1,2)
-                    const three = str.slice(2,3)
-                    const four = str.slice(3,4)
-                    // const five = str.slice(4,5)
-                    //高血压区域
-                    if(two == 'h') {
-                        if(three == 'l') {
-                            switch(four){
-                                case 'm': return { pressure: 100, color: '#e6a23c' }
-                                case 'a': return { pressure: 97, color: '#e6a23c' }
-                                case 'b': return { pressure: 95, color: '#e6a23c' }
-                                case 'c': return { pressure: 92, color: '#e6a23c' }
-                            }
-                        } else if(three == 'm') {
-                            switch(four){
-                                case 'm': return { pressure: 110, color: '#f56c6c' }
-                                case 'a': return { pressure: 107, color: '#f56c6c' }
-                                case 'b': return { pressure: 105, color: '#f56c6c' }
-                                case 'c': return { pressure: 102, color: '#f56c6c' }
-                            }
-                        } else if(three == 's') {
-                            return { pressure: 115, color: '#ff0000' }
-                        } 
+                //低压区域
+                else if(two == 'l') {
+                    return { pressure: 80, color: '#663399' }
+                }
+            }
+            //解密 -- 低
+            function getStatusLow(str) {
+                //最后一位忽略
+                if(!str) return { pressure: 0, color: '#000' }
+                const one = str.slice(0,1)
+                const two = str.slice(1,2)
+                const three = str.slice(2,3)
+                const four = str.slice(3,4)
+                // const five = str.slice(4,5)
+                //高血压区域
+                if(two == 'h') {
+                    if(three == 'l') {
+                        switch(four){
+                            case 'm': return { pressure: 100, color: '#e6a23c' }
+                            case 'a': return { pressure: 97, color: '#e6a23c' }
+                            case 'b': return { pressure: 95, color: '#e6a23c' }
+                            case 'c': return { pressure: 92, color: '#e6a23c' }
+                        }
+                    } else if(three == 'm') {
+                        switch(four){
+                            case 'm': return { pressure: 110, color: '#f56c6c' }
+                            case 'a': return { pressure: 107, color: '#f56c6c' }
+                            case 'b': return { pressure: 105, color: '#f56c6c' }
+                            case 'c': return { pressure: 102, color: '#f56c6c' }
+                        }
+                    } else if(three == 's') {
+                        return { pressure: 115, color: '#ff0000' }
                     } 
-                    //正常区域
-                    else if(two == 'n') {
-                        if(three == 'n') {
-                            switch(four){
-                                case 'm': return { pressure: 80, color: '#67c23a' }
-                                case 'a': return { pressure: 75, color: '#67c23a' }
-                                case 'b': return { pressure: 70, color: '#67c23a' }
-                                case 'c': return { pressure: 65, color: '#67c23a' }
-                            }
-                        } else if(three == 'h') {
-                            switch(four){
-                                case 'm': return { pressure: 90, color: '#ffff37' }
-                                case 'a': return { pressure: 87, color: '#ffff37' }
-                                case 'b': return { pressure: 85, color: '#ffff37' }
-                                case 'c': return { pressure: 82, color: '#ffff37' }
-                            }
+                } 
+                //正常区域
+                else if(two == 'n') {
+                    if(three == 'n') {
+                        switch(four){
+                            case 'm': return { pressure: 80, color: '#67c23a' }
+                            case 'a': return { pressure: 75, color: '#67c23a' }
+                            case 'b': return { pressure: 70, color: '#67c23a' }
+                            case 'c': return { pressure: 65, color: '#67c23a' }
+                        }
+                    } else if(three == 'h') {
+                        switch(four){
+                            case 'm': return { pressure: 90, color: '#ffff37' }
+                            case 'a': return { pressure: 87, color: '#ffff37' }
+                            case 'b': return { pressure: 85, color: '#ffff37' }
+                            case 'c': return { pressure: 82, color: '#ffff37' }
                         }
                     }
-                    //低压区域
-                    else if(two == 'l') {
-                        return { pressure: 80, color: '#ff1493' }
-                    }
                 }
-        
-                //颜色 -- 高
-                function getColorHigh(num) {
-                    if(num <= 90) {
-                        return '#ff1493'
-                    } else if(num <= 120 && num > 90) {
-                        return '#67c23a'
-                    } else if(num <= 140 && num > 120) {
-                        return '#ffff37'
-                    } else if(num <= 160 && num > 140) {
-                        return '#e6a23c'
-                    } else if(num <= 180 && num > 160) {
-                        return '#f56c6c'
-                    } else if(num > 180) {
-                        return '#ff0000'
-                    }
+                //低压区域
+                else if(two == 'l') {
+                    return { pressure: 80, color: '#663399' }
                 }
+            }
+    
+            //颜色 -- 高
+            function getColorHigh(num) {
+                if(num <= 90) {
+                    return '#663399'
+                } else if(num <= 120 && num > 90) {
+                    return '#67c23a'
+                } else if(num <= 140 && num > 120) {
+                    return '#ffff37'
+                } else if(num <= 160 && num > 140) {
+                    return '#e6a23c'
+                } else if(num <= 180 && num > 160) {
+                    return '#f56c6c'
+                } else if(num > 180) {
+                    return '#ff0000'
+                }
+            }
 
-                //颜色 -- 低
-                function getColorLow(num) {
-                    if(num <= 60) {
-                        return '#ff1493'
-                    } else if(num <= 80 && num > 60) {
-                        return '#67c23a'
-                    } else if(num <= 90 && num > 80) {
-                        return '#ffff37'
-                    } else if(num <= 100 && num > 90) {
-                        return '#e6a23c'
-                    } else if(num <= 110 && num > 100) {
-                        return '#f56c6c'
-                    } else if(num > 110) {
-                        return '#ff0000'
-                    }
+            //颜色 -- 低
+            function getColorLow(num) {
+                if(num <= 60) {
+                    return '#663399'
+                } else if(num <= 80 && num > 60) {
+                    return '#67c23a'
+                } else if(num <= 90 && num > 80) {
+                    return '#ffff37'
+                } else if(num <= 100 && num > 90) {
+                    return '#e6a23c'
+                } else if(num <= 110 && num > 100) {
+                    return '#f56c6c'
+                } else if(num > 110) {
+                    return '#ff0000'
                 }
+            }
+
+            this.loading = false
         }        
     },
     mounted() {

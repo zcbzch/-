@@ -54,6 +54,21 @@ export default new Router({
                     name: 'blood-pressure-data',
                     component: () => import('@/views/user/blood-pressure-data.vue'),
                 },
+                {
+                    path: 'blood-sugar-introduction',
+                    name: 'blood-sugar-introduction',
+                    component: () => import('@/views/introduction/blood-sugar-introduction.vue'),
+                },
+                {
+                    path: 'blood-pressure-introduction',
+                    name: 'blood-pressure-introduction',
+                    component: () => import('@/views/introduction/blood-pressure-introduction.vue'),
+                },
+                {
+                    path: 'health',
+                    name: 'health',
+                    component: () => import('@/views/introduction/health.vue'),
+                },
             ]
         },
         {

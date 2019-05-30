@@ -198,7 +198,7 @@
                 return `${month}/${day}`
             },
             $_getData: async function() {
-                // this.loading = true
+                this.loading = true
                 //日
                 await this.axios.get('/detail/blood-sugar/today')
                     .then((res) => {
@@ -329,12 +329,15 @@
                         this.chartData.trend.date = arrTime
                         this.chartData.trend.sugar = arrSugar
                         this.lineChart()
-                        console.log(arrTime)
-                        console.log(arrSugar)
+                        // console.log(arrTime)
+                        // console.log(arrSugar)
                     })
-                    .catch(res => {})
+                    .catch(err => {
+                        console.log(err)
+                    })
                 
                 //解密
+                this.loading = false
                 function getStatus(str) {
                     //最后一位忽略
                     if(!str) return { sugar: 0, color: '#000' }

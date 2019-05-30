@@ -19,7 +19,7 @@ var users = {
     },
     getUserInformation(data, callback) {
         pool.getConnection((err, connection) => {
-            var sql = ` select sex, age, height, weight
+            var sql = ` select username, sex, age, height, weight
                         from user 
                         where username = "${data}"`
 

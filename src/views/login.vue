@@ -1,5 +1,5 @@
 <template>
-    <div id="login">
+    <div id="login" v-loading.fullscreen.lock="loading">
         <div class="header">
             <div class="left" @click="$_routerBack()"><i class="el-icon-arrow-left"></i></div>
         </div>
@@ -54,12 +54,13 @@ export default {
         }
     },
     methods: {
-        $_login() {
+        $_login: async function() {
             let params = {
                 username: this.userData.username,
                 password: this.userData.password,
             }
-            this.axios.post('/users/login', params)
+            this.loading = true
+            await this.axios.post('/users/login', params)
                 .then((res) => {
                     res = res.data
                     if (res.code = 200000) {
@@ -76,6 +77,7 @@ export default {
                 .catch((error) => {  
                     console.log(error)
                 })
+            this.loading = false
         },
         $_routerBack() {
             this.$router.push({ name: 'user' })

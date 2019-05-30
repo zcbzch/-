@@ -11,7 +11,7 @@
             <div class="chart-header">血压危险度示意图</div>
             <div class="chart-title">
                 <div class="item">
-                    <div class="block-color" style="background-color:#ff1493"></div>
+                    <div class="block-color" style="background-color:#663399"></div>
                     <p>低血压</p>
                 </div>
                 <div class="item">
@@ -41,7 +41,7 @@
                     <p>临界单期</p>
                 </div>
                 <div class="item">
-                    <div class="block-color" style="background-color:#663399"></div>
+                    <div class="block-color" style="background-color:#ff1493"></div>
                     <p>单纯收缩期</p>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                 return result
             },
             $_getData: async function() {
-                // this.loading = true
+                this.loading = true
                 await this.axios.get('/detail/blood-pressure/today')
                     .then((res) => {
                         let data = res.data.data
@@ -239,7 +239,7 @@
                             if(highData[i] > 140 && highData[i] <= 160 && lowData[i] < 90) {
                                 highColor[i] = '#6666ff'
                             } else if(highData[i] > 160 && lowData[i] < 90) {
-                                highColor[i] = '#663399'
+                                highColor[i] = '#ff1493'
                             }
                         }
                         this.chartData.today.pressureHigh = highData
@@ -299,7 +299,7 @@
                             if(highData[i] > 140 && highData[i] <= 160 && lowData[i] < 90) {
                                 highColor[i] = '#6666ff'
                             } else if(highData[i] > 160 && lowData[i] < 90) {
-                                highColor[i] = '#663399'
+                                highColor[i] = '#ff1493'
                             }
                         }
                         
@@ -353,7 +353,7 @@
                             if(highData[i] > 140 && highData[i] <= 160 && lowData[i] < 90) {
                                 highColor[i] = '#6666ff'
                             } else if(highData[i] > 160 && lowData[i] < 90) {
-                                highColor[i] = '#663399'
+                                highColor[i] = '#ff1493'
                             }
                         }
                         
@@ -447,7 +447,7 @@
                     }
                     //低压区域
                     else if(two == 'l') {
-                        return { pressure: 80, color: '#ff1493' }
+                        return { pressure: 80, color: '#663399' }
                     }
                 }
                 //解密 -- 低
@@ -499,14 +499,14 @@
                     }
                     //低压区域
                     else if(two == 'l') {
-                        return { pressure: 80, color: '#ff1493' }
+                        return { pressure: 80, color: '#663399' }
                     }
                 }
         
                 //颜色 -- 高
                 function getColorHigh(num) {
                     if(num <= 90) {
-                        return '#ff1493'
+                        return '#663399'
                     } else if(num <= 120 && num > 90) {
                         return '#67c23a'
                     } else if(num <= 140 && num > 120) {
@@ -523,7 +523,7 @@
                 //颜色 -- 低
                 function getColorLow(num) {
                     if(num <= 60) {
-                        return '#ff1493'
+                        return '#663399'
                     } else if(num <= 80 && num > 60) {
                         return '#67c23a'
                     } else if(num <= 90 && num > 80) {
@@ -536,6 +536,8 @@
                         return '#ff0000'
                     }
                 }
+
+                this.loading = false
             },
             makeChartToday() {
                 var ctx = document.getElementsByClassName("pressureChartToday");

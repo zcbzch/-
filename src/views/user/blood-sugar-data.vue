@@ -1,5 +1,5 @@
 <template>
-    <div id="blood-sugar-data">
+    <div id="blood-sugar-data" v-loading.fullscreen.lock="loading">
         <div class="header">
             <div class="left" @click="() => {this.$router.back()}"><i class="el-icon-arrow-left"></i></div>
             {{ `血糖记录` }}
@@ -50,7 +50,9 @@
         <div class="row" v-for="(item, index) in chartData" :key="index">
             <div class="dateTime">{{ $_formDate(item.date) }}</div>
             <div class="dayTime">{{ $_formDay(item.date) }}</div>
-            <div class="data" :style="`background-color:${item.blood_sugar.color}`"></div>
+            <div class="data">
+                <div class="colorBlock" :style="`background-color:${item.blood_sugar.color}`"></div>
+            </div>
         </div>
     </div>
 </template>
@@ -60,7 +62,8 @@ export default {
     name: 'blood-sugar-data',
     data() {
         return {
-            chartData: {}
+            chartData: {},
+            loading: false
         }
     },
     methods: {
@@ -106,6 +109,7 @@ export default {
             return result
         },
         $_getData: async function() {
+            this.loading = true
             this.axios.get('/detail/blood-sugar/list')
                 .then((res) => {
                     let data = res.data.data
@@ -188,6 +192,7 @@ export default {
                         return { sugar: 2.4, color: '#663399' }
                     }
                 }
+            this.loading = false
         }        
     },
     mounted() {
@@ -250,6 +255,7 @@ export default {
                 @flex-center();
                 width: 25%;
                 height: 40px;
+                padding: 5px;
                 border-top: 1px solid #DCDFE6;
                 background-color: #F2F6FC;
             }
@@ -257,6 +263,7 @@ export default {
                 @flex-center();
                 width: 25%;
                 height: 40px;
+                padding: 5px;
                 border-top: 1px solid #DCDFE6;
             }
             .data {
@@ -265,6 +272,12 @@ export default {
                 height: 40px;
                 border-top: 1px solid #DCDFE6;
                 background-color: #F2F6FC;
+                padding: 5px;
+                .colorBlock {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 4px;
+                }
             }
         }
     }

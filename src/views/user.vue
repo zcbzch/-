@@ -1,5 +1,5 @@
 <template>
-    <div id="user">
+    <div id="user" v-loading.fullscreen.lock="loading">
         <div class="user-header">
            <div class="top">{{ username.length > 0 ? username:'我' }}</div>
            <div class="middle">
@@ -11,10 +11,10 @@
         </div>
 
         <div class="user-information">
-            <mt-field label="性别" placeholder="请填写性别" v-model="userData.sex"></mt-field>
-            <mt-field label="年龄" placeholder="请填写年龄" v-model="userData.age"></mt-field>
-            <mt-field label="体重" placeholder="请填写体重" v-model="userData.weight"></mt-field>
-            <mt-field label="身高" placeholder="请填写身高" v-model="userData.height"></mt-field>
+            <mt-field label="性别" placeholder="请填写性别" v-model="userData.sex" disableClear></mt-field>
+            <mt-field label="年龄" placeholder="请填写年龄" v-model="userData.age" disableClear></mt-field>
+            <mt-field label="体重" placeholder="请填写体重" v-model="userData.weight" disableClear></mt-field>
+            <mt-field label="身高" placeholder="请填写身高" v-model="userData.height" disableClear></mt-field>
         </div>
        
         <div class="user-operation">
@@ -48,7 +48,8 @@
                     age: '',
                     height: '',
                     weight: '',
-                }
+                },
+                loading: false,
             }
         },
         computed: {
@@ -57,16 +58,13 @@
             }
         },
         methods: {
-            $_getUserInformation() {
-                let params = { username: this.username }
-                // console.log(params)
-                this.axios.get('/users/information', { params: params })
+            $_getUserInformation: async function() {
+                this.loading = true
+                await this.axios.get('/users/information')
                     .then(res => {
-                        console.log(res)
-                        res = res.data
+                        let data = res.data.data
                         if(res.code = 200000) {
-                            this.userData = res.data
-                            // console.log(this.userData)
+                            this.userData = data
                         }
                     })
                     .catch((error) => {
@@ -77,9 +75,10 @@
                             })
                         }
                     })
+                this.loading = false
             },
             $_routeToLogin() {
-                console.log('click login')
+                // console.log('click login')
                 if(this.username.length > 0) {
                     sessionStorage.clear()
                     this.$router.push({ name: 'login' })
