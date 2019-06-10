@@ -110,7 +110,7 @@ export default {
         },
         $_getData: async function() {
             this.loading = true
-            this.axios.get('/detail/blood-sugar/list')
+            this.axios.get('/api/detail/blood-sugar/list')
                 .then((res) => {
                     let data = res.data.data
                     data = this.sortBobble(data)
@@ -120,7 +120,7 @@ export default {
                     this.chartData = data
                 })
                 .catch((error) => {
-                    if(error.response.status = 401) {
+                    if(error.response.status == 401) {
                         MessageBox('提示', '登录过期，请重新登录')
                         .then(action => {
                             this.$router.push({name: 'login'})

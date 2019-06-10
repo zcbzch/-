@@ -79,7 +79,7 @@
         methods: {
             $_getData: async function() {
                 // this.loading = true
-                await this.axios.get('/detail/blood-pressure')
+                await this.axios.get('api/detail/blood-pressure')
                     .then((res) => {
                         this.data = res.data.data
                         handleData.call(this, 3, 0)
@@ -94,7 +94,7 @@
                         this.loading = false
                     })
                     .catch((error) => {
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})

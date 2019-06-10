@@ -53,6 +53,7 @@ router.get('/blood-sugar/week', (req, res) => {
         }
     })
 })
+
 //血糖  月
 router.get('/blood-sugar/month', (req, res) => {
     if(!req.user.name) {
@@ -131,6 +132,7 @@ function classifyByDate(arr) {
         } 
     }
     // console.log(obj)
+    // if(!obj.beforeDawn.length &&!obj.morning.length &&!obj.noon.length &&!obj.dusk.length)
     return obj
 }
 
@@ -248,7 +250,7 @@ function classifyPressureByDate(arr) {
         let time = date.getHours()
         if(time >= 21 && time < 24) {
             // console.log('睡前')
-            obj.beforeDawn.push({ 
+            obj.beforeSleep.push({ 
                 pressureHigh: item.pressure_high, 
                 pressureLow: item.pressure_low
             })

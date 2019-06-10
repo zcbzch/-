@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var sugar = require('../data/modules/blood-sugar.js')
+var pressure = require('../data/modules/blood-pressure.js')
 //综合
 router.get('/mutiple', (req, res) => {
     if(!req.user.name) {
@@ -56,15 +57,25 @@ router.get('/mutiple', (req, res) => {
 })
 
 //血糖
-// router.get('/blood-sugar', (req, res) => {
-//   if(!req.headers.authorization == req.sessionID) {
-//     result = common.error('登录过期，请重新登录')
-//     res.send(result)
-//   }
-//   var m = 70
-//   result = common.success('成功', m)
-//   res.send(result)
-// });
+router.get('/blood-sugar', (req, res) => {
+  if(!req.headers.authorization == req.sessionID) {
+    result = common.error('登录过期，请重新登录')
+    res.send(result)
+  }
+  var userData = req.user.name
+  sugar.getSugarData(userData, (data) => {
+    if(data.length > 0) {
+        let myData = common.stringToObj(data[0].u_data)
+        let average = handleData(myData)
+        let risk = caculateRiskNum(average)
+        result = common.success('成功', {riskNum:risk})
+        res.send(result)
+    } else {
+        result = common.error('失败')
+        res.send(result)
+    }
+  })
+});
 
 //血压
 router.get('/blood-pressure', (req, res) => {
@@ -73,18 +84,18 @@ router.get('/blood-pressure', (req, res) => {
     res.send(result)
   }
   var userData = req.user.name
-    pressure.getPressureData(userData, (data) => {
-      if(data.length > 0) {
-          let myData = common.stringToObj(data[0].u_data)
-          let average = handleData(myData)
-          let risk = caculateRiskNum(average)
-          result = common.success('成功', {riskNum:risk})
-          res.send(result)
-      } else {
-          result = common.error('失败')
-          res.send(result)
-      }
-    })
+  pressure.getPressureData(userData, (data) => {
+    if(data.length > 0) {
+        let myData = common.stringToObj(data[0].u_data)
+        let average = handleData(myData)
+        let risk = caculateRiskNum(average)
+        result = common.success('成功', {riskNum:risk})
+        res.send(result)
+    } else {
+        result = common.error('失败')
+        res.send(result)
+    }
+  })
 });
 
 module.exports = router;

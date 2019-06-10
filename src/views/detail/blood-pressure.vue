@@ -63,7 +63,7 @@
 
         <!-- 高压趋势 -->
         <div class="chart">
-            <div class="chart-header">收缩压变化趋势图（月）</div>
+            <div class="chart-header">收缩压变化趋势图</div>
             <div class="chart-container">
                 <canvas class="pressureChartTrendHigh" height="80%" width="80%"></canvas>
             </div>
@@ -71,7 +71,7 @@
 
         <!-- 低压趋势 -->
         <div class="chart">
-            <div class="chart-header">舒张压变化趋势图（月）</div>
+            <div class="chart-header">舒张压变化趋势图</div>
             <div class="chart-container">
                 <canvas class="pressureChartTrendLow" height="80%" width="80%"></canvas>
             </div>
@@ -200,7 +200,7 @@
             },
             $_getData: async function() {
                 this.loading = true
-                await this.axios.get('/detail/blood-pressure/today')
+                await this.axios.get('/api/detail/blood-pressure/today')
                     .then((res) => {
                         let data = res.data.data
                         let highData = []
@@ -253,7 +253,7 @@
                         this.loading = false
                     })
                     .catch((error) => {
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})
@@ -261,7 +261,7 @@
                         }
                     })
 
-                await this.axios.get('/detail/blood-pressure/week')
+                await this.axios.get('/api/detail/blood-pressure/week')
                     .then((res) => {
                         let data = res.data.data
                         let highData = []
@@ -315,7 +315,7 @@
                         // console.log(error)
                     })
                 //月
-                await this.axios.get('/detail/blood-pressure/month')
+                await this.axios.get('/api/detail/blood-pressure/month')
                     .then((res) => {
                         let data = res.data.data
                         let highData = []
@@ -369,7 +369,7 @@
                         // console.log(error)
                     })
 
-                await this.axios.get('/detail/blood-pressure/list')
+                await this.axios.get('/api/detail/blood-pressure/list')
                     .then(res => {
                         let data = res.data.data
                         data = this.sortBobble(data)
@@ -384,15 +384,18 @@
                             arrHigh.push((getStatusHigh(data[i].pressure_high).pressure))
                             arrLow.push((getStatusLow(data[i].pressure_low).pressure))
                         }
-                        // console.log(arrHigh)
-                        // console.log(arrLow)
+                        if(arrTime.length > 15) {
+                            for(let i = 0; i < (arrTime.length-15); i++) {
+                                arrHigh.shift()
+                                arrLow.shift()
+                                arrTime.shift()
+                            }
+                        }
                         this.chartData.trend.date = arrTime
                         this.chartData.trend.high = arrHigh
                         this.chartData.trend.low = arrLow
                         this.lineChartHigh()
                         this.lineChartLow()
-                        console.log(arrTime)
-                        console.log(arrSugar)
                     })
                     .catch(err => {
                         console.log(err)

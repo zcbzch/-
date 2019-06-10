@@ -23,12 +23,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(session)
 
+
+app.use((req, res, next) => {
+    console.log(req.url)
+
+    next()
+})
+
 app.use(expressJWT({
     secret: 'health'
 }).unless({
     path: [
       {
-        url: '/users/login', 
+        url: '/api/users/login', 
         methods: ['POST']
       },
       // {
@@ -54,9 +61,9 @@ app.use(expressJWT({
 //     next()
 // })
 
-app.use('/index', indexRouter);
-app.use('/detail', detailRouter);
-app.use('/users', usersRouter);
+app.use('/api/index', indexRouter);
+app.use('/api/detail', detailRouter);
+app.use('/api/users', usersRouter);
 
 //处理json数据，UTF-8数据. row-Buffer流数据，text-文本数据
 app.all('*', function(req, res, next) {

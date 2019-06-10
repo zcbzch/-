@@ -1,7 +1,7 @@
 <template>
     <div id="home">
         <div class="test-header" v-loading.fullscreen.lock="loading">
-           <p class="header">危机指数</p>
+           <p class="header">健康危机指数</p>
            <el-progress 
                 type="circle" 
                 :width='200' 
@@ -20,12 +20,12 @@
         </div>
 
         <div class="swipe">
-            <mt-swipe :auto="3000">
+            <mt-swipe :auto="2000">
                 <mt-swipe-item>
                     <img style="width:100%; height:100%"
                         src="../assets/swipe1.png" 
                         @click="() => {
-                            
+                            this.$router.push({name: 'health'})
                         }"/>
                 </mt-swipe-item>
                 <mt-swipe-item>
@@ -44,6 +44,7 @@
                 </mt-swipe-item>
             </mt-swipe>
         </div>
+
 
         <div class="test-container">
            <div class="test-item">
@@ -153,7 +154,7 @@
             },
             $_getRiskNum: async function() {
                 this.loading = true
-                await this.axios.get('/detail/blood-sugar/week')
+                await this.axios.get('/api/detail/blood-sugar/week')
                     .then((res) => {
                         let data = res.data.data
                         let arrData = []
@@ -165,6 +166,7 @@
                             for(let i of arr) {
                                 result += getStatus(i).sugar
                                 this.riskNumSet.bloodSugar.tip = getStatus(i).tip
+                                // console.log(this.riskNumSet.bloodSugar)
                             }
                             // console.log(this.riskNumSet.bloodSugar.tip)
                             result /= arr.length
@@ -176,21 +178,23 @@
                         if(this.chartData.length) {
                             let m = 0
                             for(let item of this.chartData) {
+                                if(!item) continue
                                 m += item
                             }
                             m /= this.chartData.length
-    
                             this.riskNumSet.bloodSugar.number = caculateRiskNum(m)
-                            this.riskNumSet.bloodSugar.color = getColor(m)
+                            this.riskNumSet.bloodSugar.color = getColor(m).color
+                            this.riskNumSet.bloodSugar.tip = getColor(m).tip
+                            console.log(this.riskNumSet.bloodSugar.number)
+                            console.log(m)
                         }
-                        
                         this.$_getPressureRisk()
                         this.loading = false
                         
                     })
                     .catch((error) => {  
                         console.log(error)
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})
@@ -199,7 +203,8 @@
                     })
                 //危险度计算
                 function caculateRiskNum(m) {
-                    if(m > 6.1 && m <= 8.4) {
+                    console.log(m)
+                    if(m > 6.1) {
                         m = (m - 5) / 1.7
                         m = Math.pow(m, -2) + 1
                         m = 1 / m
@@ -211,7 +216,7 @@
                         m = Math.pow(m, -2) + 1
                         m = 1 / m
                     }
-                    // console.log(m)
+                    console.log(m)
                     return Math.round(m * 100)
                 }
                 //解密
@@ -254,55 +259,79 @@
                     else if(two == 'n') {
                         if(three == 'l') {
                             switch(four){
-                                case 'm': return { sugar: 3.9, color: '#6666ff' }
-                                case 'a': return { sugar: 3.7, color: '#6666ff' }
-                                case 'b': return { sugar: 3.4, color: '#6666ff' }
-                                case 'c': return { sugar: 3.1, color: '#6666ff' }
+                                case 'm': return { sugar: 3.9, color: '#6666ff', tip: '血糖浓度正常偏低，建议多补充营养'}
+                                case 'a': return { sugar: 3.7, color: '#6666ff', tip: '血糖浓度正常偏低，建议多补充营养'}
+                                case 'b': return { sugar: 3.4, color: '#6666ff', tip: '血糖浓度正常偏低，建议多补充营养'}
+                                case 'c': return { sugar: 3.1, color: '#6666ff', tip: '血糖浓度正常偏低，建议多补充营养'}
                             }
                         } else if(three == 'n') {
                             switch(four){
-                                case 'm': return { sugar: 5.5, color: '#67c23a' }
-                                case 'a': return { sugar: 5.3, color: '#67c23a' }
-                                case 'b': return { sugar: 4.7, color: '#67c23a' }
-                                case 'c': return { sugar: 4.1, color: '#67c23a' }
+                                case 'm': return { sugar: 5.5, color: '#67c23a', tip: '血糖浓度很正常，继续保持'}
+                                case 'a': return { sugar: 5.3, color: '#67c23a', tip: '血糖浓度很正常，继续保持'}
+                                case 'b': return { sugar: 4.7, color: '#67c23a', tip: '血糖浓度很正常，继续保持'}
+                                case 'c': return { sugar: 4.1, color: '#67c23a', tip: '血糖浓度很正常，继续保持'}
                             }
                         } else if(three == 'h') {
                             switch(four){
-                                case 'm': return { sugar: 6.0, color: '#ffff37' }
-                                case 'a': return { sugar: 5.9, color: '#ffff37' }
-                                case 'b': return { sugar: 5.8, color: '#ffff37' }
-                                case 'c': return { sugar: 5.7, color: '#ffff37' }
+                                case 'm': return { sugar: 6.0, color: '#ffff37', tip: '血糖浓度正常偏高，建议进行身体检查'}
+                                case 'a': return { sugar: 5.9, color: '#ffff37', tip: '血糖浓度正常偏高，建议进行身体检查'}
+                                case 'b': return { sugar: 5.8, color: '#ffff37', tip: '血糖浓度正常偏高，建议进行身体检查'}
+                                case 'c': return { sugar: 5.7, color: '#ffff37', tip: '血糖浓度正常偏高，建议进行身体检查'}
                             }
                         }
                     }
-                    //低压区域
+                    //低血糖区域
                     else if(two == 'l') {
-                        return { sugar: 2.4, color: '#ff1493' }
+                        return { sugar: 2.4, color: '#ff1493', tip: '血糖浓度过低，存在低血糖，请尽快就医' }
                     }
                 }
                 function getColor(num) {
                     if(num <= 2.9) {
-                        return '#ff1493'
+                        return {
+                            color: '#ff1493',
+                            tip: '血糖浓度过低，存在低血糖，请尽快就医'
+                        }
                     } else if(num <= 3.9 && num > 2.9) {
-                        return '#6666ff'
+                        return {
+                            color: '#6666ff',
+                            tip: '血糖浓度正常偏低，建议多补充营养'
+                        }
                     } else if(num <= 5.5 && num > 3.9) {
-                        return '#67c23a'
+                        return {
+                            color: '#67c23a',
+                            tip: '血糖浓度很正常，继续保持'
+                        }
                     } else if(num <= 6.0 && num > 5.5) {
-                        return '#ffff37'
+                        return {
+                            color: '#ffff37',
+                            tip: '血糖浓度正常偏高，建议进行身体检查'
+                        }
                     } else if(num <= 7.0 && num > 6.0) {
-                        return '#e6a23c'
+                        return {
+                            color: '#e6a23c',
+                            tip: '已达到高血糖指标，建议提高健康意识'
+                        }
                     } else if(num <= 8.4 && num > 7.0) {
-                        return '#f56c6c'
+                        return {
+                            color: '#f56c6c',
+                            tip: '血糖较高，可能存在轻度糖尿病，请就医'
+                        }
                     } else if(num <= 11.1 && num > 8.4) {
-                        return '#ff0000'
+                        return {
+                            color: '#ff0000',
+                            tip: '血糖高，存在中度糖尿病，请及时就医'
+                        }
                     } else if(num > 11.1) {
-                        return '#A52A2A'
+                        return {
+                            color: '#A52A2A',
+                            tip: '患有重度糖尿病，请立即就医'
+                        }
                     }
                 }
             },
             $_getPressureRisk: async function() {
                 
-                await this.axios.get('/detail/blood-pressure/week')
+                await this.axios.get('/api/detail/blood-pressure/week')
                     .then((res) => {
                         let data = res.data.data
                         let highData = []
@@ -346,11 +375,13 @@
                             let color = ''
                             // console.log(n)
                             for(let item of this.highData) {
+                                if(!item) continue
                                 m += item
                             }
                             m /= this.highData.length
 
                             for(let item of this.lowData) {
+                                if(!item) continue
                                 n += item
                             }
                             n /= this.lowData.length
@@ -373,7 +404,7 @@
                             this.riskNumSet.bloodPressure.color = color
                             // console.log(riskNum)
                             if(n < 90 && m >= 140) {
-                                let risk = caculateRiskNumSimple(m)
+                                let risk = caculateRiskNumSimple.call(this, m)
                             }
                         }
                         
@@ -389,7 +420,7 @@
                     })
                     .catch((error) => { 
                         console.log(error)
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})
@@ -442,13 +473,14 @@
                     return Math.round(m * 100)
                 }
                 function caculateRiskNumSimple(m) {
-                    console.log(m)
+                    // console.log(m)
                     if(m > 160) {
                         m = (m - 150) / 10
                         m = Math.pow(m, -2) + 1
                         m = 1 / m
                         this.riskNumSet.bloodPressure.tip = '临界单纯收缩期高血压，请提高注意并就医检查'
                         this.riskNumSet.bloodPressure.color = '#ff1493'
+
                     } else if(m > 140 && m <= 160) {
                         m = Math.pow(m - 140, 3)
                         let n = Math.pow(10, -5)
@@ -462,7 +494,7 @@
                 }
                 //解密 -- 高
                 function getStatusHigh(str) {
-                    console.log(str)
+                    // console.log(str)
                     //最后一位忽略
                     if(!str) return { pressure: 0, color: '#000' }
                     const one = str.slice(0,1)
@@ -653,16 +685,17 @@
         }
 
         .test-container {
-            margin: 10px 0;
+            margin-top: 10px;
             // background-color: #eee;
             .test-item {
                 height: 120px;
                 display: flex;
                 align-items: center;
                 padding: 0 40px;
-                background-color:#fff;
+                // background-color:#fff;
+                background: linear-gradient(rgb(155, 170, 250),rgb(158, 233, 252));
                 border-top: 1px solid #409EFF;
-                border-bottom: 1px solid #409EFF;
+                // border-bottom: 1px solid #409EFF;
                 margin-top: 10px;
                 border-radius: 4px;
                 .item-text {
@@ -677,6 +710,7 @@
                         font-weight: 600;
                     }
                     .footer {
+                        // border: 1px solid red;
                         word-wrap: break-word;
                     }
                     .el-progress {

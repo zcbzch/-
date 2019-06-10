@@ -82,5 +82,8 @@
                 font-size: 24px;
             }
         }
+        .mint-tabbar {
+            // border-top: 1px solid rgba(97, 118, 236, .5)
+        }
     }
 </style>

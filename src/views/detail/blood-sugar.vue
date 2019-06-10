@@ -61,7 +61,7 @@
         </div>
 
         <div class="chart">
-            <div class="chart-header">血糖变化趋势图（月）</div>
+            <div class="chart-header">血糖变化趋势图</div>
             <div class="chart-container">
                 <canvas class="sugarChartTrend" height="80%" width="80%"></canvas>               
             </div>
@@ -200,15 +200,21 @@
             $_getData: async function() {
                 this.loading = true
                 //日
-                await this.axios.get('/detail/blood-sugar/today')
+                await this.axios.get('/api/detail/blood-sugar/today')
                     .then((res) => {
                         let data = res.data.data
                         let arrData = []
                         let arrColor = []
-                        let obj = {}
+                        let obj = {
+                            beforeDawn: [],
+                            morning: [],
+                            noon: [],
+                            dusk: [],
+                        }
                         // console.log(data)
                         for(let item in data) {
                             let arr = data[item]
+                            if(!arr.length) continue
                             let result = 0
                             for(let i of arr) {
                                 result += getStatus(i).sugar
@@ -230,7 +236,7 @@
                         
                     })
                     .catch((error) => {  
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})
@@ -239,14 +245,20 @@
                     })
 
                 //周
-                await this.axios.get('/detail/blood-sugar/week')
+                await this.axios.get('/api/detail/blood-sugar/week')
                     .then((res) => {
                         let data = res.data.data
                         let arrData = []
                         let arrColor = []
-                        let obj = {}
+                        let obj = {
+                            beforeDawn: [],
+                            morning: [],
+                            noon: [],
+                            dusk: [],
+                        }
                         for(let item in data) {
                             let arr = data[item]
+                            if(!arr.length) continue
                             let result = 0
                             // console.log(arr)
                             for(let i of arr) {
@@ -278,14 +290,20 @@
                         console.log(error)
                     })
                 //月
-                await this.axios.get('/detail/blood-sugar/month')
+                await this.axios.get('/api/detail/blood-sugar/month')
                     .then((res) => {
                         let data = res.data.data
                         let arrData = []
                         let arrColor = []
-                        let obj = {}
+                        let obj = {
+                            beforeDawn: [],
+                            morning: [],
+                            noon: [],
+                            dusk: [],
+                        }
                         for(let item in data) {
                             let arr = data[item]
+                            if(!arr.length) continue
                             let result = 0
                             for(let i of arr) {
                                 result += getStatus(i).sugar
@@ -313,7 +331,7 @@
                     })
 
                 //趋势
-                await this.axios.get('/detail/blood-sugar/list')
+                await this.axios.get('/api/detail/blood-sugar/list')
                     .then(res => {
                         let data = res.data.data
                         data = this.sortBobble(data)
@@ -326,11 +344,20 @@
                             arrTime.push(this.$_formDate(data[i].date))
                             arrSugar.push((getStatus(data[i].blood_sugar).sugar))
                         }
+                        if(arrSugar.length > 15) {
+                            for(let i = 0; i < (arrSugar.length-15); i++) {
+                                // console.log('hhh')
+                                arrSugar.shift()
+                                arrTime.shift()
+                                // console.log(arrSugar)
+                                // console.log(arrTime)
+                            }
+                        }
                         this.chartData.trend.date = arrTime
                         this.chartData.trend.sugar = arrSugar
                         this.lineChart()
                         // console.log(arrTime)
-                        // console.log(arrSugar)
+                        
                     })
                     .catch(err => {
                         console.log(err)

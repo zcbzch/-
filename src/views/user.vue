@@ -60,15 +60,17 @@
         methods: {
             $_getUserInformation: async function() {
                 this.loading = true
-                await this.axios.get('/users/information')
+                await this.axios.get('/api/users/information')
                     .then(res => {
                         let data = res.data.data
-                        if(res.code = 200000) {
+                        console.log(res)
+                        if(res.data.code == 200000) {
                             this.userData = data
+                            console.log(this.userData)
                         }
                     })
                     .catch((error) => {
-                        if(error.response.status = 401) {
+                        if(error.response.status == 401) {
                             MessageBox('提示', '登录过期，请重新登录')
                             .then(action => {
                                 this.$router.push({name: 'login'})
@@ -124,7 +126,7 @@
                 margin-top: 20px;
                 height: 60px;
                 line-height: 60px;
-                
+                font-size: 18px;
             }
         }
 
@@ -145,7 +147,7 @@
                 padding: 8px;
                 margin: 10px 0;
                 border-radius: 8px;
-                background-color: #409EFF;
+                background: radial-gradient(rgb(97, 118, 236),rgb(64, 202, 236));
                 color: #fff;
                 display: flex;
                 justify-content: center;
