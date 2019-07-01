@@ -12,9 +12,9 @@ function random(base, dValue, digit = 0) {
 function createDataSugar(username, hours,sugar) {
 
     let time = new Date(new Date().setHours(0, 0, 0, 0)).getTime()
+    let day = 1000 * 60 * 60 * 24
     let now = new Date().getTime()
     let hour = 1000 * 60 * 60
-    let day = 1000 * 60 * 60 * 24
     var data = []
     //加密
     function handleData(data) {
@@ -111,9 +111,9 @@ function createDataSugar(username, hours,sugar) {
 function createDataPressure(username, hours, pressureHigh, pressureLow) {
 
     let time = new Date(new Date().setHours(0, 0, 0, 0)).getTime()
-    let now = new Date().getTime()
-    let hour = 1000 * 60 * 60
     let day = 1000 * 60 * 60 * 24
+    let hour = 1000 * 60 * 60
+    let now = new Date().getTime() + 5 * hour
     var data = []
     //加密 高压
     function handleDataHigh(data) {
@@ -253,16 +253,26 @@ function createDataPressure(username, hours, pressureHigh, pressureLow) {
         })
     })
 }
-// createDataSugar('zhangsan', 18, 6.2)
-// createDataSugar('zhangsan', 16, 6.9)
-// createDataSugar('zhangsan', 19, 6.5)
-// createDataSugar('zhangsan', 21, 5.8)
-// createDataSugar('zhangsan', 24, 7.1)
-// createDataPressure('zhangsan', 1, 144, 85)
-// createDataPressure('zhangsan', 16, 136, 81)
-// createDataPressure('zhangsan', 9, 143, 89)
-// createDataPressure('zhangsan', 12, 139, 85)
-// createDataPressure('zhangsan', 15, 150, 83)
+// createDataSugar('zhangsan', 1, 8.5)
+// createDataSugar('zhangsan', 4, 6.3)
+// createDataSugar('zhangsan', 7, 5.9)
+// createDataSugar('zhangsan', 10, 5.5)
+// createDataSugar('zhangsan', 14, 6.2)
+// createDataSugar('zhangsan', 17, 5.1)
+// createDataSugar('zhangsan', 20, 4.4)
+// createDataSugar('zhangsan', 23, 4.6)
+
+
+
+createDataPressure('zhangsan', 2, 127, 97)
+// createDataPressure('zhangsan', 4, 127, 96)
+// createDataPressure('zhangsan', 7, 128, 99)
+// createDataPressure('zhangsan', 10, 119, 92)
+// createDataPressure('zhangsan', 14, 120, 99)
+// createDataPressure('zhangsan', 17, 130, 100)
+// createDataPressure('zhangsan', 20, 131, 99)
+// createDataPressure('zhangsan', 24, 125, 97)
+// createDataPressure('zhangsan', 27, 150, 83)
 
 // function updateData() {
 //     let current = new Date()
